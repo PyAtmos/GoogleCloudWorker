@@ -3,8 +3,67 @@
 import numpy as np
 import hashlib
 from copy import deepcopy
+import os
+import sys
+from datetime import datetime
+
 
 # create the SQL database
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy import create_engine
+
+Base = declarative_base()
+
+class ParameterSpace(Base):
+	__tablename__ = 'parameterspace'
+	id = Column(Integer, primary_key=True)
+	hash = Column(String(32))
+	H2 = Column(Float)
+	O2 = Column(Float)
+	#...
+	state = Column(String)
+	start_time = Column(DateTime)
+	out_dir = Column(String)
+	error_msg = Column(String)
+	complete_msg = Column(String)
+	run_time = Column(DateTime)
+
+	def __init__(self, parameter_dict):
+		self.id = hash_param(parameter_dict)
+		self.H2 = parameter_dict['H2']
+		self.O2 = parameter_dict['O2']
+		#...
+		self.state = "Queue"
+		self.start_time = datetime.utcnow()
+
+# Create an engine that stores data in the local directory's
+# sqlalchemy_example.db file.
+engine = create_engine('sqlite:///sqlalchemy_example.db')
+
+# Create all tables in the engine. This is equivalent to "Create Table"
+# statements in raw SQL.
+Base.metadata.create_all(engine)
+
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
+
+# Insert a Person in the person table
+platform_obj = ParameterSpace(platform_dict)
+session.add(platform_obj)
+session.commit()
+
+# Check Existence
+ret = session.query(exists().where(platform_obj.hash==hash_param(parameter_dict))).scalar()
+
+# Edit Row
+point_obj = session.query.filter_by(hash=hash_param(parameter_dict)).first()
+point_obj.state = "Running"
+point_obj.start_time = datetime.utcnow()
+session.commit()
+
+
 
 # create container with 2*p nodes where p is the number of parameters we are searching through for the atmos model
 # start master with initial point:
