@@ -9,13 +9,14 @@ from datetime import datetime
 
 
 # create the SQL database
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
+from sqlalchemy.sql import exists, filter_by
+
 
 Base = declarative_base()
-
 class ParameterSpace(Base):
 	__tablename__ = 'parameterspace'
 	id = Column(Integer, primary_key=True)
@@ -29,9 +30,9 @@ class ParameterSpace(Base):
 	error_msg = Column(String)
 	complete_msg = Column(String)
 	run_time = Column(DateTime)
-
+	#
 	def __init__(self, parameter_dict):
-		self.id = hash_param(parameter_dict)
+		self.hash = hash_param(parameter_dict)
 		self.H2 = parameter_dict['H2']
 		self.O2 = parameter_dict['O2']
 		#...
@@ -55,13 +56,18 @@ session.add(platform_obj)
 session.commit()
 
 # Check Existence
-ret = session.query(exists().where(platform_obj.hash==hash_param(parameter_dict))).scalar()
+ret = session.query(exists().where(ParameterSpace.hash==hash_param(p))).scalar()
 
 # Edit Row
-point_obj = session.query.filter_by(hash=hash_param(parameter_dict)).first()
+point_obj = session.query(ParameterSpace).filter_by(hash=hash_param(parameter_dict)).first()
 point_obj.state = "Running"
 point_obj.start_time = datetime.utcnow()
 session.commit()
+
+# OR
+#session.query().\
+#       filter(ParameterSpace.hash == hash_param(p)).\
+#       update({"state": "Running", "start_time": datetime.utcnow()})
 
 
 
