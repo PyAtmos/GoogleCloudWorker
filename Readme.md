@@ -18,10 +18,23 @@ We'd also like to be a bit careful with how we start our search...We can start a
 
 ### The Strategy
 
-1. Have 1 pod to host a Redis server for the 'task_queue'. Workers will grab the next job from the task_queue.
-2. ~~Have 1 pod to host a Redis server for the 'platform_queue'. Workers will submit the state they just submited to the platform_queue for some master node to process and generate mor jobs for the task_queue.~~ UPDATE: Adrian (Google) had the idea to just have the worker do all the processing that the master would do. Let the worker decide if it should find the neighbors of that point, and add those neighbors to the task_queue.
-3. words
+1. Have 1 pod to host a Redis server for the 'task_queue'. Workers will grab the next job from the task_queue. The queue will store and pass a hash value corresponding to the input parameters for that state.
+2. ~~Have 1 pod to host a Redis server for the 'platform_queue'. Workers will submit the state they just submited to the platform_queue for some master node to process and generate mor jobs for the task_queue.~~ **UPDATE**: Adrian (Google) had the idea to just have the worker do all the processing that the master would do. Let the worker decide if it should find the neighbors of that point, and add those neighbors to the task_queue.
+3. Create a Cloud SQL database so that we can have a global log of all activity and to prevent redundancy in our runs.
 
+   Store the following:
+   * unique hash built from a dictionary of the input parameters
+   * input parameter values
+   * current state (queue, running, error, completed)
+   * start_time (updates after entering queue and after starting run)
+   * error_msg (if it errored, give a short descriptive error message)
+   * complete_msg (if it completed, what was the output...stable/unstable, # temp value)
+   * run_time (updates after erroring or completing)
+   * out_path (directory/url path to the copied output files from the run if completed)
+
+4. Replicated workers nodes with the Pyatmos image and an additional python file to allow communication to the task_queue and SQL database. Complete with a K8 Job Object or not? [Preemptible Instances](https://cloud.google.com/compuhttps://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms)?
+
+5. 
 
 ### References
 
