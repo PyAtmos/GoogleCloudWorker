@@ -44,8 +44,8 @@ Will need a *Pod* (or *Demployment*?) K8 Object and a *Service* Object for the R
 
 Start service with...
 
-    kubectl create -f ./redis-pod.yaml
-    kubectl create -f ./redis-service.yaml
+    $ kubectl create -f ./redis/redis-pod.yaml
+    $ kubectl create -f ./redis/redis-service.yaml
 
 
 ### References

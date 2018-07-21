@@ -1,0 +1,35 @@
+# https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
+
+# also a Deployment example in
+# https://github.com/kubernetes/examples/blob/master/guestbook/redis-master-deployment.yaml
+
+
+# CHANGE LIST
+# haven't made any changes yet
+# but prob should change/verify the following
+# * .apiVersion
+# * .kind: Pod vs Deployment?
+# * do I need to give a proper image for .spec.containers.image? 
+# ^image : k8s.gcr.io/redis:e2e ...from the Deployment example from above
+# * .spec.containers.ports.containePort change value?
+# * the Deployment example gave a .spec.containers.resources.requests ; should we?
+# ^resources:
+# ^  requests:
+# ^      cpu: 100m
+# ^      memory: 100Mi
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+spec:
+  containers:
+    - name: master
+      image: redis
+      env:
+        - name: MASTER
+          value: "true"
+      ports:
+        - containerPort: 6379
