@@ -67,7 +67,7 @@ Base.metadata.create_all(engine)
 ####################
 ##### useful functions
 
-def create_db(data):
+def add_db(data):
     # data is parameter_dict
     # Insert a Person in the person table
     point = ParameterSpace(data)
@@ -105,7 +105,7 @@ def complete_db(msg, data=None, hash=None):
     return "%s completed: %s" % (point.hash, msg)
 
 
-def delete(data=None, hash=None):
+def delete_db(data=None, hash=None):
     if data is not None:
         hashed = hash_param(data)
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
@@ -113,7 +113,7 @@ def delete(data=None, hash=None):
     session.commit()
     return "deleted %s" % point.hash
 
-def exists(data=None, hash=None):
+def exists_db(data=None, hash=None):
     if data is not None:
         hashed = hash_param(data)
     ret = session.query(exists().where(ParameterSpace.hash==hashed)).scalar()
