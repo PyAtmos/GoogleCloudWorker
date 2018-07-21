@@ -18,11 +18,16 @@ We'd also like to be a bit careful with how we start our search...We can start a
 
 ### The Strategy
 
+1. Have 1 pod to host a Redis server for the 'task_queue'. Workers will grab the next job from the task_queue.
+2. ~~Have 1 pod to host a Redis server for the 'platform_queue'. Workers will submit the state they just submited to the platform_queue for some master node to process and generate mor jobs for the task_queue.~~ UPDATE: Adrian (Google) had the idea to just have the worker do all the processing that the master would do. Let the worker decide if it should find the neighbors of that point, and add those neighbors to the task_queue.
+3. words
 
 
 ### References
 
 A few links that helped in exploring about Google Cloud Engine (GCE), Kubernetes (K8), and Redis.
+
+* Kubernetes [Concepts](https://kubernetes.io/docs/concepts/): A lot to read there and a lot to learn; especially the *Workloads* Section.
 
 * Kubernetes - [Fine Parallel Processing USing a Work Queue](https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/): how to use a K8 'Job' Object and Redis to send jobs to worker nodes..."In this example, as each pod is created, it picks up one unit of work from a task queue, processes it, and repeats until the end of the queue is reached."
 
