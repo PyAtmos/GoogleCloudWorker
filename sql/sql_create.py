@@ -4,6 +4,7 @@
 #https://cloud.google.com/python/getting-started/using-cloud-sql
 
 ####################################################################################################
+from starter import start
 
 #from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -16,11 +17,31 @@ from sqlalchemy.sql import exists, filter_by
 
 ####################
 ### Quick Ftn
-def hash_param(platform):
-    string = ""
-    for molecule, concentration in platform.items():
-        string += molecule
-        string += str(concentration)
+def param_str_enc(platform_dict):
+    platform_str = ""
+    for molecule, _ in start.items():
+        #string += molecule
+        concentration = platform_dict[molecule]
+        platform_str += str(concentration)
+        platform_str += ","
+    platform_str = platform_str[-1] #remove trailing comma
+    return platform_str
+
+def param_str_dec(platform_str):
+    platform_list = platform_str.split(",")
+    platform_dict = {}
+    for i, (molecule,_) in enumerate(start.items()):
+        platform_dict[molecule] = platform_list[i]
+    return platform_dict
+
+def param_hash(platform):
+    if type(platform) is dict:
+        string = param_str(platform)
+    elif type(platform) is str:
+        string = platform
+    else:
+        print("ERROR: platform in param_hash() not a string or dict")
+        return 0
     hash_object = hashlib.md5(str.encode(string))
     return hash_object.hexdigest()
 
@@ -51,7 +72,7 @@ class ParameterSpace(Base):
     out_path = Column(String)
     #
     def __init__(self, parameter_dict):
-        self.hash = hash_param(parameter_dict)
+        self.hash = param_hash(parameter_dict)
         self.H2 = parameter_dict['H2']
         self.O2 = parameter_dict['O2']
         #...

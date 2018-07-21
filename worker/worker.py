@@ -1,82 +1,40 @@
-# pseudo code for the master
+# SOURCE: for only the redis part
+#https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
 
+# packages
 import numpy as np
 import hashlib
 from copy import deepcopy
 import os
 import sys
+import time
 from datetime import datetime
-
-
-# create the SQL database
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.sql import exists, filter_by
 
-
-Base = declarative_base()
-class ParameterSpace(Base):
-    __tablename__ = 'parameterspace'
-    id = Column(Integer, primary_key=True)
-    hash = Column(String(32))
-    H2 = Column(Float)
-    O2 = Column(Float)
-    #...
-    state = Column(String)
-    start_time = Column(DateTime)
-    error_msg = Column(String)
-    complete_msg = Column(String)
-    run_time = Column(DateTime)
-    out_path = Column(String)
-    #
-    def __init__(self, parameter_dict):
-        self.hash = hash_param(parameter_dict)
-        self.H2 = parameter_dict['H2']
-        self.O2 = parameter_dict['O2']
-        #...
-        self.state = "Queue"
-        self.start_time = datetime.utcnow()
-
-# Create an engine that stores data in the local directory's
-# sqlalchemy_example.db file.
-engine = create_engine('sqlite:///sqlalchemy_example.db')
-
-# Create all tables in the engine. This is equivalent to "Create Table"
-# statements in raw SQL.
-Base.metadata.create_all(engine)
-
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
-
-# Insert a Person in the person table
-platform_obj = ParameterSpace(platform_dict)
-session.add(platform_obj)
-session.commit()
-
-# Check Existence
-ret = session.query(exists().where(ParameterSpace.hash==hash_param(p))).scalar()
-
-# Edit Row
-point_obj = session.query(ParameterSpace).filter_by(hash=hash_param(parameter_dict)).first()
-point_obj.state = "Running"
-point_obj.start_time = datetime.utcnow()
-session.commit()
-
-# OR
-#session.query().\
-#       filter(ParameterSpace.hash == hash_param(p)).\
-#       update({"state": "Running", "start_time": datetime.utcnow()})
+# scripts
+import sql_create as sql
+import rediswq
+from starter import start
 
 
+# functions to handle the real work!
+def round_partial(value, resolution):
+    return round(float(value)/float(resolution), resolution)
 
-# create container with 2*p nodes where p is the number of parameters we are searching through for the atmos model
-# start master with initial point:
+def calc_filler(point):
+    filler = 1-point['other'] # starting point...where constants is the concentration of molecules we're holding constant
+    for i, concentration in point.items():
+        if i no in ["other","filler"]:
+            filler -= concentration
+        else:
+            continue
+    return filler
 
-# function: given a platform point, find neighbors, check comformatiy with rules, add to job queue, and add to sql db
-
-def build_queue(platform, increment_dict, job_queue, step_size=1, search_mode="sides"):
+def explore(platform, increment_dict, job_queue, step_size=1, search_mode="sides"):
     # let's say platform is not a list of values but a dictionary:
     #platform = {
     #            "O2" : .05,
@@ -113,7 +71,7 @@ def build_queue(platform, increment_dict, job_queue, step_size=1, search_mode="s
                 else:
                     pass
                 #check if neighbor point already in DB, if yes then don't add, if no then add
-                inDB = check_DB(neighbor)
+                inDB = sql.exists_db(data=neighbor)
                 if in inDB:
                     # already in DB...don't add
                     continue
@@ -153,37 +111,45 @@ def build_queue(platform, increment_dict, job_queue, step_size=1, search_mode="s
                 continue
             else:
                 # add to queue and to DB
-                job_queue.add(neighbor)
-                add_DB(neighbor)
-                added_2_queue = True    
+                sql.add_db(neighbor)
+                q.put(param_str_enc(start))
+                added_2_queue = True
 
 
-    # ...so did we actually add any neighbors to the queue
-    if not added_2_queue:
-        # do we want to do anything here?
-        #check job_queue size...if it's 0
-        #check worker_queue size...if it's the same size as number of workers total
-        #then no one is working and there is nothing to work on
-        if (job_queue.size()==0) & (worker_queue.size()==n_workers):
-            # we reached the border
 
 
-def round_partial(value, resolution):
-    return round(float(value)/float(resolution), resolution)
 
-def calc_filler(point):
-    filler = 1-point['other'] # starting point...where constants is the concentration of molecules we're holding constant
-    for i, concentration in point.items():
-        if i no in ["other","filler"]:
-            filler -= concentration
+
+
+
+host="redis"
+# Uncomment next two lines if you do not have Kube-DNS working.
+# import os
+# host = os.getenv("REDIS_SERVICE_HOST")
+
+q = rediswq.RedisWQ(name="job2", host="redis")
+print("Worker with sessionID: " +  q.sessionID())
+print("Initial queue state: empty=" + str(q.empty()))
+while not q.empty():
+    item = q.lease(lease_secs=10, block=True, timeout=2) #CHANGE? the lease n timeout?
+    if item is not None:
+        itemstr = item.decode("utf=8")
+        print("Working on " + itemstr)
+        input_parameters = sql.param_str_dec(itemstr)
+        #add to sql db as running
+        sql.run_db(data=input_parameters)
+        '''
+        PYATMOS GOES HERE
+        '''
+        q.complete(item)
+        if errored:
+            sql.error_db(msg, data=input_parameters)
         else:
-            continue
-    return filler
+            sql.complete_db(msg, data=input_parameters)
+            if stable:
+                # find neighbors and add to queue
+                explore(input_parameters, increment_dict, q, step_size=2)
 
-def hash_param(platform):
-    string = ""
-    for molecule, concentration in platform.items():
-        string += molecule
-        string += str(concentration)
-    hash_object = hashlib.md5(str.encode(string))
-    return hash_object.hexdigest()
+    else:
+        print("Waiting for work")
+print("Queue empty, exiting")
