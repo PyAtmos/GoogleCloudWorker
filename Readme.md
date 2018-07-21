@@ -34,19 +34,19 @@ We'd also like to be a bit careful with how we start our search...We can start a
 
 #### Redis Task Queue
 
-*See **References** Section bellow for any links + code mentioned*
+*See References Section bellow for any links + code mentioned*
 
 Will need a *Pod* (or *Demployment*?) K8 Object and a *Service* Object for the Redis Task Queue.
 
-* Following taken from **Reference 4**...
+* Following taken from *Reference 4*...
 * redis-deployment.yaml
 * redis-service.yaml
 
 Start service with...
 
-```kubectl create -f ./redis-pod.yaml
-kubectl create -f ./redis-service.yaml
-```
+    kubectl create -f ./redis-pod.yaml
+    kubectl create -f ./redis-service.yaml
+
 
 ### References
 
