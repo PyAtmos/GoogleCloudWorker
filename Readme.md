@@ -2,7 +2,7 @@
 
 The goal of this is to create the infrastructure to take a containerized program, scale it to a large N number of nodes, but to still retain some sort of communication between resources as to what jobs should be run...super vague (and maybe not properly worded) but that'll further be explained in the next section I'm sure.
 
-### Outline
+## Outline
 
 Right now this is built for scaling the Atmos program (Fortran) and the Python wrapper that triggers and customizes the Atmos run. See [**Pyatmos** repo](https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos).
 
@@ -16,7 +16,7 @@ We want to search the parameter space that will give us stable or unstable (or s
 
 We'd also like to be a bit careful with how we start our search...We can start at an 'Earth-like' condition where the input parameters best reflect the current Earth model; then we'd slightly permutate our parameters and explore outwardly from there. This makes the problem of scaling to multiple nodes interesting because we want to use the output from one state to decide whether further exploration is desired around that state or not.
 
-### The Strategy
+## The Strategy
 
 1. Have 1 pod to host a Redis server for the 'task_queue'. Workers will grab the next job from the task_queue. The queue will store and pass a hash value corresponding to the input parameters for that state.
 2. ~~Have 1 pod to host a Redis server for the 'platform_queue'. Workers will submit the state they just submited to the platform_queue for some master node to process and generate mor jobs for the task_queue.~~ **UPDATE**: Adrian (Google) had the idea to just have the worker do all the processing that the master would do. Let the worker decide if it should find the neighbors of that point, and add those neighbors to the task_queue.
@@ -32,7 +32,7 @@ We'd also like to be a bit careful with how we start our search...We can start a
 
 4. Replicated workers nodes with the Pyatmos image and an additional python file to allow communication to the task_queue and SQL database. Complete with a K8 Job Object or not? [Preemptible Instances](https://cloud.google.com/compuhttps://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms)?
 
-#### Redis Task Queue
+### Redis Task Queue
 
 *See References Section bellow for any links + code mentioned*
 
@@ -48,11 +48,11 @@ Start service with...
     $ kubectl create -f ./redis/redis-service.yaml
 
 
-#### Cloud SQL
+### Cloud SQL
 
-Here is the link to the Database I already made for testing...[kuber-db-test-rodd](https://console.cloud.google.com/sql/instances/kuber-db-test-rodd/overview?project=i-agility-205814&duration=PT1H)
+Here is the link to the Database I already made for testing...[**kuber-db-test-rodd**](https://console.cloud.google.com/sql/instances/kuber-db-test-rodd/overview?project=i-agility-205814&duration=PT1H)
 
-Reference 5 gave some hints on how to connect to Cloud SQL but they were also doing it through/with a other python packages (Flask) since they wanted to host a webpage or something. Here is the snippit of code, copy n pasted, that gives the info...Sourced from the config.py file
+Reference 5 gave some hints on how to connect to Cloud SQL but they were also doing it through/with a other python packages (Flask) since they wanted to host a webpage or something. Here is the snippit of code, copy n pasted, that gives the info...Sourced from the config.py file...
 
     # The CloudSQL proxy is used locally to connect to the cloudsql instance.
     # To start the proxy, use:
@@ -68,9 +68,11 @@ Reference 5 gave some hints on how to connect to Cloud SQL but they were also do
             user=CLOUDSQL_USER, password=CLOUDSQL_PASSWORD,
             database=CLOUDSQL_DATABASE)
 
+So I still need to figure out the best way to connect the sqlalchemy stuff to the GCE SQL database that is linked above.
 
 
-### References
+
+## References
 
 A few links that helped in exploring about Google Cloud Engine (GCE), Kubernetes (K8), and Redis.
 
