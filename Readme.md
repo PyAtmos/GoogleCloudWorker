@@ -21,8 +21,9 @@ We'd also like to be a bit careful with how we start our search...We can start a
 1. Have 1 pod to host a Redis server for the 'task_queue'. Workers will grab the next job from the task_queue. The queue will store and pass a hash value corresponding to the input parameters for that state.
 2. ~~Have 1 pod to host a Redis server for the 'platform_queue'. Workers will submit the state they just submited to the platform_queue for some master node to process and generate mor jobs for the task_queue.~~ **UPDATE**: Adrian (Google) had the idea to just have the worker do all the processing that the master would do. Let the worker decide if it should find the neighbors of that point, and add those neighbors to the task_queue.
 3. Create a Cloud SQL database so that we can have a global log of all activity and to prevent redundancy in our runs. 
+
    Store the following:
-   
+
    * unique hash built from a dictionary of the input parameters
    * input parameter values
    * current state (queue, running, error, completed)
