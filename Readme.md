@@ -48,6 +48,28 @@ Start service with...
     $ kubectl create -f ./redis/redis-service.yaml
 
 
+#### Cloud SQL
+
+Here is the link to the Database I already made for testing...[kuber-db-test-rodd](https://console.cloud.google.com/sql/instances/kuber-db-test-rodd/overview?project=i-agility-205814&duration=PT1H)
+
+Reference 5 gave some hints on how to connect to Cloud SQL but they were also doing it through/with a other python packages (Flask) since they wanted to host a webpage or something. Here is the snippit of code, copy n pasted, that gives the info...Sourced from the config.py file
+
+    # The CloudSQL proxy is used locally to connect to the cloudsql instance.
+    # To start the proxy, use:
+    #
+    #   $ cloud_sql_proxy -instances=your-connection-name=tcp:3306
+    #
+    # Port 3306 is the standard MySQL port. If you need to use a different port,
+    # change the 3306 to a different port number.
+
+    # Alternatively, you could use a local MySQL instance for testing.
+    LOCAL_SQLALCHEMY_DATABASE_URI = (
+        'mysql+pymysql://{user}:{password}@127.0.0.1:3306/{database}').format(
+            user=CLOUDSQL_USER, password=CLOUDSQL_PASSWORD,
+            database=CLOUDSQL_DATABASE)
+
+
+
 ### References
 
 A few links that helped in exploring about Google Cloud Engine (GCE), Kubernetes (K8), and Redis.
