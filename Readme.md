@@ -4,7 +4,7 @@ The goal of this is to create the infrastructure to take a containerized program
 
 ## Outline
 
-Right now this is built for scaling the Atmos program (Fortran) and the Python wrapper that triggers and customizes the Atmos run. See (Pyatmos Repo)[https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos].
+Right now this is built for scaling the Atmos program (Fortran) and the Python wrapper that triggers and customizes the Atmos run. See [Pyatmos Repo](https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos).
 
 Other words
 
