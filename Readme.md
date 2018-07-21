@@ -1,10 +1,10 @@
 # Test Readme
 Check one two
 
--list
+- list
 - lists
 - listsss
 
 1. numbers
-2.numbers
+2. numbers
 
