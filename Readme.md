@@ -32,18 +32,32 @@ We'd also like to be a bit careful with how we start our search...We can start a
 
 4. Replicated workers nodes with the Pyatmos image and an additional python file to allow communication to the task_queue and SQL database. Complete with a K8 Job Object or not? [Preemptible Instances](https://cloud.google.com/compuhttps://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms)?
 
-5. 
+#### Redis Task Queue
+
+*See **References** Section bellow for any links + code mentioned*
+
+Will need a *Pod* (or *Demployment*?) K8 Object and a *Service* Object for the Redis Task Queue.
+
+* Following taken from **Reference 4**...
+* redis-deployment.yaml
+* redis-service.yaml
+
+Start service with...
+
+```kubectl create -f ./redis-pod.yaml
+kubectl create -f ./redis-service.yaml
+```
 
 ### References
 
 A few links that helped in exploring about Google Cloud Engine (GCE), Kubernetes (K8), and Redis.
 
-* Kubernetes [Concepts](https://kubernetes.io/docs/concepts/): A lot to read there and a lot to learn; especially the *Workloads* Section.
+1. Kubernetes [Concepts](https://kubernetes.io/docs/concepts/): A lot to read there and a lot to learn; especially the *Workloads* Section.
 
-* Kubernetes - [Fine Parallel Processing USing a Work Queue](https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/): how to use a K8 'Job' Object and Redis to send jobs to worker nodes..."In this example, as each pod is created, it picks up one unit of work from a task queue, processes it, and repeats until the end of the queue is reached."
+2. Kubernetes - [Fine Parallel Processing USing a Work Queue](https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/): how to use a K8 'Job' Object and Redis to send jobs to worker nodes..."In this example, as each pod is created, it picks up one unit of work from a task queue, processes it, and repeats until the end of the queue is reached."
 
-* [Redis Documentation](https://redis-py.readthedocs.io/en/latest/): be sure to check out *StrictRedis()* class
+3. [Redis Documentation](https://redis-py.readthedocs.io/en/latest/): be sure to check out *StrictRedis()* class
 
-* Another [Redis example](https://kubernetes.io/docs/tutorials/stateless-application/guestbook/): especially good for seeing how to start a Redis Demployment + Service on GCE...and also here is the corresponding [GitHub Repo](https://github.com/kubernetes/examples/tree/master/guestbook)
+4. Another [Redis example](https://kubernetes.io/docs/tutorials/stateless-application/guestbook/): especially good for seeing how to start a Redis Demployment + Service on GCE...and also here is the corresponding [GitHub Repo](https://github.com/kubernetes/examples/tree/master/guestbook)
 
-* A bit on [Cloud SQL with Python](https://cloud.google.com/python/getting-started/using-cloud-sql): Be sure to be familiar with SQLAlchemy but don't bother with Flask...the corresponding [GitHub Repo](https://github.com/GoogleCloudPlatform/getting-started-python/tree/master/2-structured-data)
+5. A bit on [Cloud SQL with Python](https://cloud.google.com/python/getting-started/using-cloud-sql): Be sure to be familiar with SQLAlchemy but don't bother with Flask...the corresponding [GitHub Repo](https://github.com/GoogleCloudPlatform/getting-started-python/tree/master/2-structured-data)
