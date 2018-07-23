@@ -5,6 +5,7 @@
 
 ####################################################################################################
 from starter import start
+from utilities import *
 
 #from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -15,35 +16,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.sql import exists, filter_by
 
-####################
-### Quick Ftn
-def param_str_enc(platform_dict):
-    platform_str = ""
-    for molecule, _ in start.items():
-        #string += molecule
-        concentration = platform_dict[molecule]
-        platform_str += str(concentration)
-        platform_str += ","
-    platform_str = platform_str[-1] #remove trailing comma
-    return platform_str
 
-def param_str_dec(platform_str):
-    platform_list = platform_str.split(",")
-    platform_dict = {}
-    for i, (molecule,_) in enumerate(start.items()):
-        platform_dict[molecule] = platform_list[i]
-    return platform_dict
-
-def param_hash(platform):
-    if type(platform) is dict:
-        string = param_str(platform)
-    elif type(platform) is str:
-        string = platform
-    else:
-        print("ERROR: platform in param_hash() not a string or dict")
-        return 0
-    hash_object = hashlib.md5(str.encode(string))
-    return hash_object.hexdigest()
 
 
 ####################
@@ -139,3 +112,8 @@ def exists_db(data=None, hash=None):
         hashed = hash_param(data)
     ret = session.query(exists().where(ParameterSpace.hash==hashed)).scalar()
     return ret
+
+
+
+####################
+### Loop keeping an eye on Redis server
