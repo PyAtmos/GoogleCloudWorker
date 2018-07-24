@@ -95,6 +95,15 @@ Install **pip**:
     sudo pip install cloudstorage
     sudo pip install redis
 
+Install **pyatmos**:
+      
+    # move to a clean working area to checkout this package
+    git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos
+    
+    # install this python package as a module 
+    cd pyatmos
+    sudo pip install -e . 
+
 *See References Section bellow for any links + code mentioned*
 
 Will need a *Pod* (or *Demployment*?) K8 Object and a *Service* Object for the Redis Task Queue.
