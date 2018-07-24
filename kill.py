@@ -9,7 +9,7 @@ import time
 parser = argparse.ArgumentParser(description='Grab Kill-type flag')
 parser.add_argument('-k', '--killquick', type=int, default=False,
                     help='switch to do a quick kill or track a reason to kill')
-parser.add_argument('-f', '--forgive_threshold', type=int, default=False,
+parser.add_argument('-f', '--forgive_threshold', type=int, default=1,
                     help='max number of times in a row that you forgive for getting a reason to kill')
 args = parser.parse_args()
 

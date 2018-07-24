@@ -199,13 +199,14 @@ else: #master True
             param_code = item.decode("utf=8")
             complete_db(msg="Stable", data=param_code, dtype="code")
             #q.complete(item)
+            '''
             param_dict = utilities.param_decode(param_code)
             utilities.explore(
                 param_dict=param_dict,
                 increment_dict=increment_dict,
                 redis_db=q,
                 step_Size=2,
-                search_mode="sides")
+                search_mode="sides")'''
         else:
             pass
         for _ in range(2*(len(start)-2)): #...one for each direction and molecule

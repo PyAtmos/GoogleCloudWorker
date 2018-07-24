@@ -18,4 +18,4 @@ ret = add_db(start)
 
 # add 'start' to task_queue
 q = rediswq.RedisWQ(name="job2", host="redis")
-q.put(value=param_str_enc(start), queue="main")
+q.put(value=param_str_enc(start), queue="main sql")

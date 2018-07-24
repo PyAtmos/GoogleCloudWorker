@@ -26,15 +26,18 @@ We'd also like to be a bit careful with how we start our search...We can start a
 2. Cloud SQL Database to keep track of all runs.
 3. SQL Client (1 node + pod) to read queues/lists from Redis server to look for what to write/update to the Cloud SQL Database.
 4. Job K8 Objects running all the individual jobs read from a Redis queue.
-5. Master Node (1 node + pod) to search the neighbors of the completed runs, and add those points to a redis queue/line to see if it already exists on a server. (maybe put this under responsiblities of SQL Client)
+5. Master Node (1 node + pod) to search the neighbors of the completed runs, and add those points to a redis queue/line to see if it already exists on a server. (maybe put this under responsiblities of SQL Client) -> **UPDATE**: have a second SQL Client node but have it perform a different set of tasks (those of the master)
 
 Sample WorkFlow:
 
-* starter.py adds point to *main_Q*; adds to *main_sql_Q*
-* sql client takes item off *main_sql_Q* and adds it as a new point to DB
-* worker node takes item off *main_Q* and adds to *processing_Q*; adds to *running_sql_Q*; starts the run
-* worker finishes the run; adds to *error_sql_Q* if it errored; adds to *complete_sql_Q* if completed
-* sql_client takes item off *error_sql_Q* and *complete_sql_Q* and updates DB respecitvely; if 'complete', searches neighbors not already in DB; adds to *main_Q* and to *main_sql_Q*
+* starter.py adds point to *main_sql_Q*;
+* sql client (master) adds to *main_Q*
+* sql client (non-master) takes item off *main_sql_Q* and adds it as a new point to DB; also adds to *main_Q*
+* worker node takes item off *main_Q* and adds to *processing_Q* (lease function); adds to *running_sql_Q*; starts the run
+* worker finishes the run; adds to *error_sql_Q* if it errored; adds to *complete_sql_Q* if completed; 0 if stable, 1 if unstable; searches for neighbors if stable
+* sql_client takes item off *error_sql_Q* (non master) and *complete0_sql_Q* (non master) and *complete1_sql_Q* (master) and updates DB respecitvely.
+* sql_client then cheks for *main_sql_Q* items again to add to *main_Q*
+* loop continues until the kill_switch is turned on (see kill.py)
 
 Cloud SQL database...Store the following:
    * unique hash built from a dictionary of the input parameters

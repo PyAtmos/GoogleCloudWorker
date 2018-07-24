@@ -13,6 +13,7 @@ from datetime import datetime
 
 # scripts
 import rediswq
+import utilities
 from starter import start
 
 
@@ -30,6 +31,7 @@ while not q.kill():
         param_code = item.decode("utf=8")
         q.put(value=param_code, queue="run")
         #sql.run_db(data=input_parameters)
+        param_dict = utilities.param_decode(param_code)
         '''
         PYATMOS GOES HERE
         '''
@@ -44,6 +46,13 @@ while not q.kill():
                 # find neighbors and add to queue
                 #explore(input_parameters, increment_dict, q, step_size=2)
                 q.put(value=param_code, queue="complete1")
+                param_dict = utilities.param_decode(param_code)
+                utilities.explore(
+                    param_dict=param_dict,
+                    increment_dict=increment_dict,
+                    redis_db=q,
+                    step_Size=2,
+                    search_mode="sides")
             else:
                 q.put(value=param_code, queue="complete0")
 
