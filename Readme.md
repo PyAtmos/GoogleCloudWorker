@@ -102,6 +102,7 @@ Install other python packages:
     sudo pip install redis
     sudo pip install numpy
     sudo pip install sqlalchemy
+    sudo pip install pymysql
 
 Install **pyatmos**:
       
