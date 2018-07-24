@@ -98,11 +98,15 @@ Install **pip**:
 Install **pyatmos**:
       
     # move to a clean working area to checkout this package
-    git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos
+    git clone git@gitlab.com:frontierdevelopmentlab/astrobiology/pyatmos.git
     
     # install this python package as a module 
     cd pyatmos
     sudo pip install -e . 
+
+Install **docker**:
+    # This is needed for pyatmos
+    sudo apt install docker.io
 
 *See References Section bellow for any links + code mentioned*
 
