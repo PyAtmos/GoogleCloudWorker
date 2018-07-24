@@ -58,27 +58,26 @@ NOTE: Complete with a K8 Job Object or not? [Preemptible Instances](https://clou
 
 Create VM Instance and SSH into it...
 
-"""
-$ sudo apt-get update #update Debian
-$ sudo apt-get -y install redis-server #install Redis
-$ ps -f -u redis #verify it is running
-#currently will only accept connections from 127.0.0.1 - the local machine
+    $ sudo apt-get update #update Debian
+    $ sudo apt-get -y install redis-server #install Redis
+    $ ps -f -u redis #verify it is running
+    #currently will only accept connections from 127.0.0.1 - the local machine
 
-$ sudo nano /etc/redis/redis.conf #edit redis config to allow remote acess
-#change bind 127.0.0.1 to bind 0.0.0.0
-#now any IP Address can touch the redis instance
-#Redis accepts remote connections on TCP port 6379
+    $ sudo nano /etc/redis/redis.conf #edit redis config to allow remote acess
+    #change bind 127.0.0.1 to bind 0.0.0.0
+    #now any IP Address can touch the redis instance
+    #Redis accepts remote connections on TCP port 6379
 
-#open close ssh shell
-$ sudo service redis-server restart
-"""
+    #open close ssh shell
+    $ sudo service redis-server restart
+
 
 Try and 'ping' the Redis server...
 First find the "REDIS_IPV4_ADDRESS" by finding the "external IP address" of the Redis VM Instance.
-"""
-$ redis-cli -h [REDIS_IPV4_ADDRESS] ping
-#did you get pong?
-"""
+
+    $ redis-cli -h [REDIS_IPV4_ADDRESS] ping
+    #did you get pong?
+
 
 
 
