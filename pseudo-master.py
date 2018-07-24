@@ -182,7 +182,7 @@ def calc_filler(point):
 
 def hash_param(platform):
     string = ""
-    for molecule, concentration in platform.items():
+    for molecule, concentration in platform.items(): #start.items()
         string += molecule
         string += str(concentration)
     hash_object = hashlib.md5(str.encode(string))
