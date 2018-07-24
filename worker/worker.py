@@ -10,6 +10,9 @@ import sys
 import time
 from datetime import datetime
 
+# pyatmos  
+import pyatmos 
+
 
 # scripts
 import rediswq
@@ -26,9 +29,16 @@ while not q.kill():
         q.put(value=param_code, queue="run")
         #sql.run_db(data=input_parameters)
         param_dict = utilities.param_decode(param_code)
+
         '''
         PYATMOS GOES HERE
         '''
+        # TESTING
+        atmos = pyatmos.Simulation()
+        atmos.start()
+        run_code = atmos.run(species_concentrations={}, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
+
+
         #q.complete(item)
         if errored:
             q.put(value=param_code, queue="error")
