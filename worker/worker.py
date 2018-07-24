@@ -18,13 +18,7 @@ from starter import start
 
 
 
-host="redis"
-# Uncomment next two lines if you do not have Kube-DNS working.
-# import os
-# host = os.getenv("REDIS_SERVICE_HOST")
-q = rediswq.RedisWQ(name="job2", host="redis")
-
-
+q = rediswq.RedisWQ(name="job2", host=utilities.redis_host)
 while not q.kill():
     item = q.lease(lease_secs=10, block=True, timeout=2) #CHANGE? the lease n timeout?
     if item is not None:

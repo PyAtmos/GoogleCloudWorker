@@ -14,12 +14,7 @@ parser.add_argument('-f', '--forgive_threshold', type=int, default=1,
 args = parser.parse_args()
 
 
-host="redis"
-# Uncomment next two lines if you do not have Kube-DNS working.
-# import os
-# host = os.getenv("REDIS_SERVICE_HOST")
-q = rediswq.RedisWQ(name="job2", host="redis")
-
+q = rediswq.RedisWQ(name="job2", host=utilities.redis_host)
 
 if args.killquick:
     # add to the redis q for kill

@@ -2,6 +2,10 @@
 from stater import start
 
 
+# Declare redis.host
+redis_host = "10.138.0.21"
+
+
 ####################
 ### Parameter Conversions
 def param_encode(param_dict):

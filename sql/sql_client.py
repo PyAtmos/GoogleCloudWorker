@@ -153,14 +153,10 @@ def exists_db(data, dtype="dict"):
 # SOURCE: for only the redis part
 #https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
 
-host="redis"
-# Uncomment next two lines if you do not have Kube-DNS working.
-# import os
-# host = os.getenv("REDIS_SERVICE_HOST")
-q = rediswq.RedisWQ(name="job2", host="redis")
+
+q = rediswq.RedisWQ(name="job2", host=utilities.redis_host)
 # ^consider making ^decode_responses=True^ so
 # that we don't have to convert binary to unicode for getting items off list
-
 if not args.master:
     # then search for main_sql, running_sql, error_sql, complete_unstalbe
     while not q.kill():
