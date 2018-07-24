@@ -73,13 +73,27 @@ Create VM Instance and SSH into it...
 
 
 Try and 'ping' the Redis server...
-First find the "REDIS_IPV4_ADDRESS" by finding the "external IP address" of the Redis VM Instance.
+First find the "REDIS_IPV4_ADDRESS" by finding the "external* IP address" of the Redis VM Instance. *I tried 'external' and it didn't work; but 'internal IP address' did.
 
     $ redis-cli -h [REDIS_IPV4_ADDRESS] ping
     #did you get pong?
 
 
+Install and use **git**:
 
+    sudo apt install git-all
+    git clone URL
+
+
+Install **pip**:
+
+    sudo apt update
+    sudo apt install python python-dev python3 python3-dev
+    wget https://bootstrap.pypa.io/get-pip.py
+    sudo python get-pip.py
+    sudo pip install google-cloud-storage
+    sudo pip install cloudstorage
+    sudo pip install redis
 
 *See References Section bellow for any links + code mentioned*
 
