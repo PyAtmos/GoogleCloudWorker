@@ -4,10 +4,13 @@
 #https://cloud.google.com/python/getting-started/using-cloud-sql
 
 ####################################################################################################
-from starter import start
-from utilities import *
+from starter import start, increment_dict
+import utilities
+import rediswq
+import argparse
 
 #from flask_sqlalchemy import SQLAlchemy
+import time
 from datetime import datetime
 # not sure how much of this is needed...just dump all
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
@@ -16,7 +19,11 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.sql import exists, filter_by
 
-
+#####
+parser = argparse.ArgumentParser(description='Grab Master flag')
+parser.add_argument('-m', '--master', type=int, default=False,
+                    help='if nonzero, assigns node to do the "masters" work')
+args = parser.parse_args()
 
 
 ####################
@@ -41,7 +48,7 @@ class ParameterSpace(Base):
     start_time = Column(DateTime)
     error_msg = Column(String)
     complete_msg = Column(String)
-    run_time = Column(DateTime)
+    end_time = Column(DateTime)
     out_path = Column(String)
     #
     def __init__(self, parameter_dict):
@@ -61,55 +68,80 @@ Base.metadata.create_all(engine)
 ####################
 ##### useful functions
 
-def add_db(data):
+def add_db(param_dict):
     # data is parameter_dict
     # Insert a Person in the person table
-    point = ParameterSpace(data)
+    point = ParameterSpace(param_dict)
     session.add(point)
     session.commit()
     return "added to db: %s" % point.hash
 
-def run_db(data=None, hash=None):
-    if data is not None:
-        hashed = hash_param(data)
+def run_db(data, dtype="dict"):
+    if dtype == "dict":
+        hashed = utilities.param_hash(data)
+    elif dtype == "code":
+        dicted = utilities.param_decode(data)
+        hashed = utilities.param_hash(dicted)
+    else:
+        return "didn't recognize 'dtype'"
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
     point.state = "Running"
     point.start_time = datetime.utcnow()
     session.commit()
     return "running %s" % point.hash
 
-def error_db(msg, data=None, hash=None):
-    if data is not None:
-        hashed = hash_param(data)
+def error_db(msg, data, dtype="dict"):
+    if dtype == "dict":
+        hashed = utilities.param_hash(data)
+    elif dtype == "code":
+        dicted = utilities.param_decode(data)
+        hashed = utilities.param_hash(dicted)
+    else:
+        return "didn't recognize 'dtype'"
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
     point.state = "Error"
     point.error_msg = str(msg) #<-exapnd on this
-    point.run_time = datetime.utcnow() - point.start_time #<-fix this
+    point.end_time = datetime.utcnow()
     session.commit()
     return "%s errored: %s" % (point.hash, msg)
 
-def complete_db(msg, data=None, hash=None):
-    if data is not None:
-        hashed = hash_param(data)
+def complete_db(msg, data, dtype="dict"):
+    if dtype == "dict":
+        hashed = utilities.param_hash(data)
+    elif dtype == "code":
+        dicted = utilities.param_decode(data)
+        hashed = utilities.param_hash(dicted)
+    else:
+        return "didn't recognize 'dtype'"
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
     point.state = "Complete"
     point.complete_msg = str(msg) #<-exapnd on this
-    point.run_time = datetime.utcnow() - point.start_time #<-fix this
+    point.end_time = datetime.utcnow()
     session.commit()
     return "%s completed: %s" % (point.hash, msg)
 
 
-def delete_db(data=None, hash=None):
-    if data is not None:
-        hashed = hash_param(data)
+def delete_db(data, dtype="dict"):
+    if dtype == "dict":
+        hashed = utilities.param_hash(data)
+    elif dtype == "code":
+        dicted = utilities.param_decode(data)
+        hashed = utilities.param_hash(dicted)
+    else:
+        return "didn't recognize 'dtype'"
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
     session.delete(point)
     session.commit()
     return "deleted %s" % point.hash
 
-def exists_db(data=None, hash=None):
-    if data is not None:
-        hashed = hash_param(data)
+def exists_db(data, dtype="dict"):
+    if dtype == "dict":
+        hashed = utilities.param_hash(data)
+    elif dtype == "code":
+        dicted = utilities.param_decode(data)
+        hashed = utilities.param_hash(dicted)
+    else:
+        return "didn't recognize 'dtype'"
     ret = session.query(exists().where(ParameterSpace.hash==hashed)).scalar()
     return ret
 
@@ -117,3 +149,81 @@ def exists_db(data=None, hash=None):
 
 ####################
 ### Loop keeping an eye on Redis server
+
+# SOURCE: for only the redis part
+#https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
+
+host="redis"
+# Uncomment next two lines if you do not have Kube-DNS working.
+# import os
+# host = os.getenv("REDIS_SERVICE_HOST")
+q = rediswq.RedisWQ(name="job2", host="redis")
+
+if not args.master:
+    # then search for main_sql, running_sql, error_sql, complete_unstalbe
+    while not q.kill():
+        if q.size("run")+q.size("error")+q.size("complete0") == 0:
+            time.sleep(30) # kill time
+        else:
+            pass
+
+        if q.size("run") != 0:
+            item = q.get("run")
+            run_db(data=item, dtype="code")
+        else:
+            pass
+        if q.size("error") != 0:
+            item = q.get("error")
+            error_db(data=item, dtype="code")
+            q.complete(item)
+        else:
+            pass
+        if q.size("complete0"):
+            item = q.get("complete0")
+            complete_db(msg="UnStable", data=item, dtype="code")
+            #q.complete(item)
+        else:
+            pass
+
+
+else: #master True
+    # then search for complete_sql
+    while not q.kill():
+        if q.size("complete1") != 0:
+            item = q.get("complete1")
+            complete_db(msg="Stable", data=item, dtype="code")
+            #q.complete(item)
+            param_dict = utilities.param_decode(item)
+            utilities.explore(
+                param_dict=param_dict,
+                increment_dict=increment_dict,
+                redis_db=q,
+                step_Size=2,
+                search_mode="sides")
+        else:
+            pass
+        for _ in range(2*(len(start)-2)): #...one for each direction and molecule
+            if q.size("main sql") != 0:
+                item = q.get("main sql") # .to_queue()
+                if not exists_db(item, dtype="code"):#check if item in DB already
+                    add_db(data=item, dtype="code")
+                    q.put(item, "main")
+                else:
+                    # already in the DB
+                    pass
+            else:
+                break
+
+
+
+
+
+
+
+
+
+
+
+
+
+

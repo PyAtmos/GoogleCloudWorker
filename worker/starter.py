@@ -10,9 +10,12 @@ start = {
 	"filler" : 0.25
 	}
 
+increment_dict = {}
+
+
 # add 'start' to the sql db
 ret = add_db(start)
 
 # add 'start' to task_queue
 q = rediswq.RedisWQ(name="job2", host="redis")
-q.put(param_str_enc(start))
+q.put(value=param_str_enc(start), queue="main")

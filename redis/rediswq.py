@@ -37,8 +37,17 @@ class RedisWQ(object):
        # Work queue is implemented as two queues: main, and processing.
        # Work is initially in main, and moved to processing when a client picks it up.
        self._main_q_key = name
+       self._main_sql_q_key = name + ":sql:queue"
+
        self._processing_q_key = name + ":processing"
        self._lease_key_prefix = name + ":leased_by_session:"
+
+       self._running_sql_q_key = name + ":sql:running"
+       self._error_sql_q_key = name + ":sql:error"
+       self._complete0_sql_q_key = name + ":sql:complete0"
+       self._complete1_sql_q_key = name + ":sql:complete1"
+
+       self._kill_q_key = name + ":kill"
 
     def sessionID(self):
         """Return the ID for this session."""
@@ -51,6 +60,26 @@ class RedisWQ(object):
     def _processing_qsize(self):
         """Return the size of the main queue."""
         return self._db.llen(self._processing_q_key)
+
+    def size(self, q):
+        if q == "main":
+            return self._db.llen(self._main_q_key)
+        elif q == "main sql":
+            return self._db.llen(self._main_sql_q_key)
+        elif q == "run":
+            return self._db.llen(self._running_sql_q_key)
+        elif q == "error":
+            return self._db.llen(self._error_sql_q_key)
+        elif q == "complete0":
+            return self._db.llen(self._complete0_sql_q_key)
+        elif q == "complete1":
+            return self._db.llen(self._complete1_sql_q_key)
+
+    def _kill_switch(self):
+        self._db.lpush(self._kill_q_key, "1")
+
+    def kill(self):
+        return self._db.llen(self._kill_q_key) == 0
 
     def empty(self):
         """Return True if the queue is empty, including work being done, False otherwise.
@@ -82,6 +111,13 @@ class RedisWQ(object):
         """True if a lease on 'item' exists."""
         return self._db.exists(self._lease_key_prefix + self._itemkey(item))
 
+    def pre_queue(self):
+
+
+    def to_queue(self):
+        item = self._db.rpoplpush(self._main_sql_q_key, self._main_q_key)
+        return item
+
     def lease(self, lease_secs=60, block=True, timeout=None):
         """Begin working on an item the work queue. 
 
@@ -105,9 +141,34 @@ class RedisWQ(object):
         return item
 
     # rodd added:
-    def put(self, value):
+    def put(self, value, queue):
         """attempt to add a value to the main task queue"""
-        self._db.lpush(self._main_q_key, value)
+        if queue == "main":
+            self._db.lpush(self._main_q_key, value)
+        elif queue == "main sql"
+            self._db.lpush(self._main_sql_q_key, value)
+        elif queue == "run":
+            self._db.lpush(self._running_sql_q_key, value)
+        elif queue == "error":
+            self._db.lpush(self._error_sql_q_key, value)
+        elif queue == "complete0":
+            self._db.lpush(self._complete0_sql_q_key, value)
+        elif queue == "complete1":
+            self._db.lpush(self._complete1_sql_q_key, value)
+
+    def get(self, queue):
+        if queue == "main":
+            item = self._db.rpop(self._main_q_key)
+        elif queue == "main sql":
+            item = self._db.rpop(self._main_sql_q_key)
+        elif queue == "run":
+            item = self._db.rpop(self._running_sql_q_key)
+        elif queue == "error":
+            item = self._db.rpop(self._error_sql_q_key)
+        elif queue == "complete0":
+            item = self._db.rpop(self._complete0_sql_q_key)
+        elif queue == "complete1":
+            item = self._db.rpop(self._complete1_sql_q_key)
 
     def complete(self, value):
         """Complete working on the item with 'value'.
