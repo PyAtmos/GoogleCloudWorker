@@ -79,7 +79,7 @@ class RedisWQ(object):
         self._db.lpush(self._kill_q_key, "1")
 
     def kill(self):
-        return self._db.llen(self._kill_q_key) == 0
+        return self._db.llen(self._kill_q_key) > 0
 
     def empty(self):
         """Return True if the queue is empty, including work being done, False otherwise.
@@ -111,7 +111,8 @@ class RedisWQ(object):
         """True if a lease on 'item' exists."""
         return self._db.exists(self._lease_key_prefix + self._itemkey(item))
 
-    def pre_queue(self):
+    
+    #def pre_queue(self):
 
 
     def to_queue(self):
@@ -145,7 +146,7 @@ class RedisWQ(object):
         """attempt to add a value to the main task queue"""
         if queue == "main":
             self._db.lpush(self._main_q_key, value)
-        elif queue == "main sql"
+        elif queue == "main sql":
             self._db.lpush(self._main_sql_q_key, value)
         elif queue == "run":
             self._db.lpush(self._running_sql_q_key, value)
