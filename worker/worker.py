@@ -9,22 +9,11 @@ import os
 import sys
 import time
 from datetime import datetime
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy import create_engine
-from sqlalchemy.sql import exists, filter_by
+
 
 # scripts
-import sql_create as sql
 import rediswq
 from starter import start
-
-
-
-
-
-
 
 
 
