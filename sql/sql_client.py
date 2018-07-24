@@ -158,6 +158,8 @@ host="redis"
 # import os
 # host = os.getenv("REDIS_SERVICE_HOST")
 q = rediswq.RedisWQ(name="job2", host="redis")
+# ^consider making ^decode_responses=True^ so
+# that we don't have to convert binary to unicode for getting items off list
 
 if not args.master:
     # then search for main_sql, running_sql, error_sql, complete_unstalbe
@@ -169,18 +171,21 @@ if not args.master:
 
         if q.size("run") != 0:
             item = q.get("run")
-            run_db(data=item, dtype="code")
+            param_code = item.decode("utf=8")
+            run_db(data=param_code, dtype="code")
         else:
             pass
         if q.size("error") != 0:
             item = q.get("error")
-            error_db(data=item, dtype="code")
+            param_code = item.decode("utf=8")
+            error_db(data=param_code, dtype="code")
             q.complete(item)
         else:
             pass
         if q.size("complete0"):
             item = q.get("complete0")
-            complete_db(msg="UnStable", data=item, dtype="code")
+            param_code = item.decode("utf=8")
+            complete_db(msg="UnStable", data=param_code, dtype="code")
             #q.complete(item)
         else:
             pass
@@ -191,9 +196,10 @@ else: #master True
     while not q.kill():
         if q.size("complete1") != 0:
             item = q.get("complete1")
-            complete_db(msg="Stable", data=item, dtype="code")
+            param_code = item.decode("utf=8")
+            complete_db(msg="Stable", data=param_code, dtype="code")
             #q.complete(item)
-            param_dict = utilities.param_decode(item)
+            param_dict = utilities.param_decode(param_code)
             utilities.explore(
                 param_dict=param_dict,
                 increment_dict=increment_dict,
@@ -205,9 +211,10 @@ else: #master True
         for _ in range(2*(len(start)-2)): #...one for each direction and molecule
             if q.size("main sql") != 0:
                 item = q.get("main sql") # .to_queue()
-                if not exists_db(item, dtype="code"):#check if item in DB already
-                    add_db(data=item, dtype="code")
-                    q.put(item, "main")
+                param_code = item.decode("utf=8")
+                if not exists_db(param_code, dtype="code"):#check if item in DB already
+                    add_db(data=param_code, dtype="code")
+                    q.put(param_code, "main")
                 else:
                     # already in the DB
                     pass

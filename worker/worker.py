@@ -32,25 +32,21 @@ host="redis"
 # Uncomment next two lines if you do not have Kube-DNS working.
 # import os
 # host = os.getenv("REDIS_SERVICE_HOST")
-
 q = rediswq.RedisWQ(name="job2", host="redis")
-#print("Worker with sessionID: " +  q.sessionID())
-#print("Initial queue state: empty=" + str(q.empty()))
-while not q.empty():
+
+
+while not q.kill():
     item = q.lease(lease_secs=10, block=True, timeout=2) #CHANGE? the lease n timeout?
     if item is not None:
-        itemstr = item.decode("utf=8")
-        print("Working on " + itemstr)
-        input_parameters = sql.param_str_dec(itemstr)
-        #add to sql db as running
-        q.put(value=itemstr, queue="run")
+        param_code = item.decode("utf=8")
+        q.put(value=param_code, queue="run")
         #sql.run_db(data=input_parameters)
         '''
         PYATMOS GOES HERE
         '''
-        q.complete(item)
+        #q.complete(item)
         if errored:
-            q.put(value=itemstr, queue="error")
+            q.put(value=param_code, queue="error")
             #sql.error_db(msg, data=input_parameters)
         else:
             #q.put(value=itemstr, queue="complete")
@@ -58,9 +54,9 @@ while not q.empty():
             if stable:
                 # find neighbors and add to queue
                 #explore(input_parameters, increment_dict, q, step_size=2)
-                q.put(value=itemstr, queue="complete1")
+                q.put(value=param_code, queue="complete1")
             else:
-                q.put(value=itemstr, queue="complete0")
+                q.put(value=param_code, queue="complete0")
 
     else:
         print("Waiting for work")

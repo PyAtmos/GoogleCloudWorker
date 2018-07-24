@@ -31,7 +31,7 @@ class RedisWQ(object):
        The work queue is identified by "name".  The library may create other
        keys with "name" as a prefix. 
        """
-       self._db = redis.StrictRedis(**redis_kwargs)
+       self._db = redis.StrictRedis(**redis_kwargs)#
        # The session ID will uniquely identify this "worker".
        self._session = str(uuid.uuid4())
        # Work queue is implemented as two queues: main, and processing.
