@@ -4,7 +4,8 @@
 #https://cloud.google.com/python/getting-started/using-cloud-sql
 
 ####################################################################################################
-from starter import start, increment_dict
+from start import start
+#from starter import increment_dict # remove circular dependency 
 import utilities
 import rediswq
 import argparse
@@ -17,7 +18,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
-from sqlalchemy.sql import exists, filter_by
+from sqlalchemy.sql import exists#, filter_by
 
 #####
 parser = argparse.ArgumentParser(description='Grab Master flag')
