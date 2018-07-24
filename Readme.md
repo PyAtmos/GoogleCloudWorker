@@ -20,7 +20,7 @@ We'd also like to be a bit careful with how we start our search...We can start a
 
 ## The Strategy
 
-**UPDATED:*** June 23, 2018
+**UPDATED:** June 23, 2018
 
 1. Redis Server (1 node + pod) to host the queues and lists. There will be several lists, all holding a string representing the input parameters, and each serving a very specific purpose.
 2. Cloud SQL Database to keep track of all runs.
@@ -87,8 +87,16 @@ Reference 5 gave some hints on how to connect to Cloud SQL but they were also do
 So I still need to figure out the best way to connect the sqlalchemy stuff to the GCE SQL database that is linked above.
 
 
+## Dictionary
 
-## References
+We define the initial input atmosphere to Atmos by defining a **parameter** state. A parameter can be represented in 3 major ways:
+1. **Parameter Dictionary**: a key/value relationship is built from molecule/concentration; this is the best way to represent the parameter state we are exploring in understanding the inputs, but it is hard to pass a dictionary object between nodes.
+2. **Parameter Code**: a string representation/codification of the Parameter Dictionary; basically it is a comma-separated string only listing the concentrations of each molecule in order of the original 'starting point' from starter.py; this value is encoded from a dictionary and can be decoded back to a dictionary.
+3. **Parameter Hash**: a hashed representation of the Parameter Dictionary; concats molecules and concentrations together into a long string and is then hashed; can't be unhashed; good for creating a unique id for the parameter state.
+
+
+
+## References/Links
 
 A few links that helped in exploring about Google Cloud Engine (GCE), Kubernetes (K8), and Redis.
 
