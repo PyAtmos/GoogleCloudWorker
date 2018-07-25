@@ -141,42 +141,52 @@ Start service with...
 
 ### Cloud SQL
 
-i-agility-205814:us-west1:kuber-db-test-rodd
+Server: [**Link**]()
 
-mysql+mysqldb://root@/kuber-db-test-rodd?unix_socket=/cloudsql/i-agility-205814:kuber-db-test-rodd
+Connection Name:
 
-a = ('mysql+pymysql://{user}:{password}@35.197.109.206/{database}').format(
-            user=CLOUDSQL_USER, password=CLOUDSQL_PASSWORD,
-            database=CLOUDSQL_DATABASE)
+Database Name
 
-Google Cloud documentation to set up [access through IP Address](https://cloud.google.com/sql/docs/mysql/connect-external-app#appaccessIP)
+Server IP Address:
 
-[Other](http://docs.sqlalchemy.org/en/latest/dialects/mysql.html#using-mysqldb-with-google-cloud-sql)
-
-Here is the link to the Database I already made for testing...[**kuber-db-test-rodd**](https://console.cloud.google.com/sql/instances/kuber-db-test-rodd/overview?project=i-agility-205814&duration=PT1H)
+Standard MySQL port: **3306**
 
 
-Reference 5 gave some hints on how to connect to Cloud SQL but they were also doing it through/with a other python packages (Flask) since they wanted to host a webpage or something. Here is the snippit of code, copy n pasted, that gives the info...Sourced from the config.py file...
+1. Set up Cloud SQL Server
 
-    # The CloudSQL proxy is used locally to connect to the cloudsql instance.
-    # To start the proxy, use:
-    #
-    #   $ cloud_sql_proxy -instances=your-connection-name=tcp:3306
-    #
-    # Port 3306 is the standard MySQL port. If you need to use a different port,
-    # change the 3306 to a different port number.
+ * Check out the first part of the page; [Section - Create a Cloud SQL instance](https://cloud.google.com/sql/docs/mysql/quickstart)
+ * Then go to 'Databases' tab to initialize a database
+ * Note: the instructions above are for a SQL Server configured for mysql
 
-    # Alternatively, you could use a local MySQL instance for testing.
-    LOCAL_SQLALCHEMY_DATABASE_URI = (
-        'mysql+pymysql://{user}:{password}@127.0.0.1:3306/{database}').format(
-            user=CLOUDSQL_USER, password=CLOUDSQL_PASSWORD,
-            database=CLOUDSQL_DATABASE)
+2. Set up VM Instance to be 'SQL Client'
 
-I got this error after trying to connect to the Cloud SQL database...
-*"2018/07/24 21:18:24 the default Compute Engine service account is not configured with sufficient permissions to access the Cloud SQL API from this VM. Please create a new VM with Cloud SQL access (scope) enabled under "Identity and API access". Alternatively, create a new "service account key" and specify it using the -credential_file parameter"*
+ * Go to Compute Engine -> VM Instance, and create a new instance with Linux Debian
+ * Notes on connecting with mysql for a quick view...BE SURE ALL LOWERCASE:
+
+    $ gcloud sql connect <server name> --user=root
+    #enter password
+    MySQL [(none)]> Use <db name>;
+    MySQL [db name]> Select * from <table name>;
+
+ * And here is how to connect via python and sqlalchemy:
+
+    Base = declarative_base()
+    dbFilePath = 'mysql+pymysql://root:<password>@<sql server ip>:3306/<db name>'
+    engine = create_engine(dbFilePath, echo=False)
+    DBSession = sessionmaker(bind=engine)
+    session = DBSession()
+    class <class name>(Base):
+        __tablename__ = '<table name>'
+        #...
+    Base.metadata.create_all(engine)
 
 
-So I still need to figure out the best way to connect the sqlalchemy stuff to the GCE SQL database that is linked above.
+3. Configure both to speak to each other.
+
+ * We need to authorize the IP from the client to speak to the server. Check out the [video from this page](https://cloud.google.com/sql/docs/mysql/connect-compute-engine).
+ * Basically grab the External IP from the Client and add it to the Networks tab of the Server
+ * Go to VPC Network -> External IP Address, and change the IP Address Types from Ephemeral to Static for the SQL Client.
+
 
 
 ## Dictionary
