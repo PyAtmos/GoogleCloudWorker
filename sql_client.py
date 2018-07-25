@@ -65,7 +65,7 @@ class ParameterSpace(Base):
         self.state = "Queue"
         self.start_time = datetime.utcnow()
 
-if args.reset():
+if args.reset:
     print("Deleting old table and creating new one")
     # delete any old table there
     ParameterSpace.__table__.drop(engine)
