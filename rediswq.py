@@ -167,6 +167,7 @@ class RedisWQ(object):
             item = self._db.rpop(self._complete0_sql_q_key)
         elif queue == "complete1":
             item = self._db.rpop(self._complete1_sql_q_key)
+        return item
 
     def complete(self, value):
         """Complete working on the item with 'value'.

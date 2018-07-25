@@ -159,6 +159,7 @@ q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 # ^consider making ^decode_responses=True^ so
 # that we don't have to convert binary to unicode for getting items off list
 if not args.master:
+    print("Created normal SQL Client")
     while not q.kill():
         if q.size("run")+q.size("error")+q.size("complete0") == 0:
             time.sleep(30) # kill time
@@ -168,30 +169,35 @@ if not args.master:
         if q.size("run") != 0:
             item = q.get("run")
             param_code = item.decode("utf=8")
-            run_db(data=param_code, dtype="code")
+            msg = run_db(data=param_code, dtype="code")
+            print(msg)
         else:
             pass
         if q.size("error") != 0:
             item = q.get("error")
             param_code = item.decode("utf=8")
-            error_db(data=param_code, dtype="code")
-            q.complete(item)
+            msg = error_db(data=param_code, dtype="code")
+            print(msg)
+            #q.complete(item)
         else:
             pass
         if q.size("complete0"):
             item = q.get("complete0")
             param_code = item.decode("utf=8")
-            complete_db(msg="UnStable", data=param_code, dtype="code")
+            msg = complete_db(msg="UnStable", data=param_code, dtype="code")
+            print(msg)
         else:
             pass
 
 
 else: #master True
+    print("Created Master Client")
     while not q.kill():
         if q.size("complete1") != 0:
             item = q.get("complete1")
             param_code = item.decode("utf=8")
-            complete_db(msg="Stable", data=param_code, dtype="code")
+            msg = complete_db(msg="Stable", data=param_code, dtype="code")
+            print(msg)
             '''
             param_dict = utilities.param_decode(param_code)
             utilities.explore(
@@ -207,8 +213,9 @@ else: #master True
                 item = q.get("main sql")
                 param_code = item.decode("utf=8")
                 if not exists_db(param_code, dtype="code"):#check if item in DB already
-                    add_db(data=param_code, dtype="code")
+                    msg = add_db(data=param_code, dtype="code")
                     q.put(param_code, "main")
+                    print(msg)
                 else:
                     # already in the DB
                     pass
