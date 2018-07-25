@@ -48,19 +48,21 @@ session = DBSession()
 class ParameterSpace(Base):
     __tablename__ = 'parameterspace'
     id = Column(Integer, primary_key=True)
-    hash = Column(String(32))
+    hash = Column(String(256))
+    code = String(256)
     H2 = Column(Float)
     O2 = Column(Float)
     #...
-    state = Column(String(32))
+    state = Column(String(256))
     start_time = Column(DateTime)
-    error_msg = Column(String(32))
-    complete_msg = Column(String(32))
+    error_msg = Column(String(256))
+    complete_msg = Column(String(256))
     end_time = Column(DateTime)
-    out_path = Column(String(32))
+    out_path = Column(String(256))
     #
     def __init__(self, parameter_dict):
         self.hash = utilities.param_hash(parameter_dict)
+        self.code = utilities.param_encode(parameter_dict)
         self.H2 = parameter_dict['H2']
         self.O2 = parameter_dict['O2']
         #...
@@ -180,30 +182,45 @@ if not args.master:
     print("Created normal SQL Client")
     while not q.kill():
         if q.size("run")+q.size("error")+q.size("complete0") == 0:
+            ##########
+            #FUTURE WORK
+            # if all queues are empty; look up sql table to see how many are state='running'
+            # and see how long they have been running...
+            # if running for 'too long', then assume that the node died mid-run; change state to queue and add to "main"
+            ##########
             time.sleep(5) # kill time
         else:
             pass
 
         if q.size("run") != 0:
             item = q.get("run")
-            param_code = item.decode("utf=8")
-            msg = run_db(data=param_code, dtype="code")
-            print(msg)
+            if item:
+                param_code = item.decode("utf=8")
+                msg = run_db(data=param_code, dtype="code")
+                print(msg)
+            else:
+                pass
         else:
             pass
         if q.size("error") != 0:
             item = q.get("error")
-            param_code = item.decode("utf=8")
-            msg = error_db(msg="unknown", data=param_code, dtype="code")
-            print(msg)
-            #q.complete(item)
+            if item:
+                param_code = item.decode("utf=8")
+                msg = error_db(msg="unknown", data=param_code, dtype="code")
+                print(msg)
+                #q.complete(item)
+            else:
+                pass
         else:
             pass
         if q.size("complete0"):
             item = q.get("complete0")
-            param_code = item.decode("utf=8")
-            msg = complete_db(msg="unstable", data=param_code, dtype="code")
-            print(msg)
+            if item:
+                param_code = item.decode("utf=8")
+                msg = complete_db(msg="unstable", data=param_code, dtype="code")
+                print(msg)
+            else:
+                pass
         else:
             pass
 
@@ -212,34 +229,54 @@ else: #master True
     print("Created Master Client")
     while not q.kill():
         if q.size("copmlete1")+q.size("main sql") == 0:
+            if q.size("main") == 0:
+                points = session.query(ParameterSpace).filter_by(state='running')
+                for point in points:
+                    timedelta = datetime.utcnow() - point.start_time
+                    timedelta = timedelta.days * 24 * 3600 + timedelta.seconds
+                        if timedelta > MAX_JOB_RUN_TIME
+                            #add points back to queue
+                            p.state = "Queue"
+                            p.start_time = datetime.utcnow()
+                            q.put(p.code, "main")
+                        else:
+                            pass
+            else:
+                pass
             time.sleep(5) # kill time
         else:
             pass
         if q.size("complete1") != 0:
             item = q.get("complete1")
-            param_code = item.decode("utf=8")
-            msg = complete_db(msg="stable", data=param_code, dtype="code")
-            print(msg)
-            '''
-            param_dict = utilities.param_decode(param_code)
-            utilities.explore(
-                param_dict=param_dict,
-                increment_dict=increment_dict,
-                redis_db=q,
-                step_Size=2,
-                search_mode="sides")'''
+            if item:
+                param_code = item.decode("utf=8")
+                msg = complete_db(msg="stable", data=param_code, dtype="code")
+                print(msg)
+                '''
+                param_dict = utilities.param_decode(param_code)
+                utilities.explore(
+                    param_dict=param_dict,
+                    increment_dict=increment_dict,
+                    redis_db=q,
+                    step_Size=2,
+                    search_mode="sides")'''
+            else:
+                pass
         else:
             pass
         for _ in range(2*(len(start)-2)): #...one for each direction and molecule
             if q.size("main sql") != 0:
                 item = q.get("main sql")
-                param_code = item.decode("utf=8")
-                if not exists_db(param_code, dtype="code"):#check if item in DB already
-                    msg = add_db(data=param_code, dtype="code")
-                    q.put(param_code, "main")
-                    print(msg)
+                if item:
+                    param_code = item.decode("utf=8")
+                    if not exists_db(param_code, dtype="code"):#check if item in DB already
+                        msg = add_db(data=param_code, dtype="code")
+                        q.put(param_code, "main")
+                        print(msg)
+                    else:
+                        # already in the DB
+                        pass
                 else:
-                    # already in the DB
                     pass
             else:
                 break

@@ -14,6 +14,7 @@ increment_dict = {
     "H2" : {1 : 0.1}
     }
 
+MAX_JOB_RUN_TIME = 5*60*60 #in seconds
 
 # GCE Info
 PROJECT_ID = 'i-agility-205814'

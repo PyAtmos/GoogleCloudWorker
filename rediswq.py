@@ -128,13 +128,13 @@ class RedisWQ(object):
             item = self._db.brpoplpush(self._main_q_key, self._processing_q_key, timeout=timeout)
         else:
             item = self._db.rpoplpush(self._main_q_key, self._processing_q_key)
-        if item:
-            # Record that we (this session id) are working on a key.  Expire that
-            # note after the lease timeout.
-            # Note: if we crash at this line of the program, then GC will see no lease
-            # for this item a later return it to the main queue.
-            itemkey = self._itemkey(item)
-            self._db.setex(self._lease_key_prefix + itemkey, lease_secs, self._session)
+        #if item:
+        #    # Record that we (this session id) are working on a key.  Expire that
+        #    # note after the lease timeout.
+        #    # Note: if we crash at this line of the program, then GC will see no lease
+        #    # for this item a later return it to the main queue.
+        #    itemkey = self._itemkey(item)
+        #    self._db.setex(self._lease_key_prefix + itemkey, lease_secs, self._session)
         return item
 
     # rodd added:
@@ -179,8 +179,8 @@ class RedisWQ(object):
         self._db.lrem(self._processing_q_key, 0, value)
         # If we crash here, then the GC code will try to move the value, but it will
         # not be here, which is fine.  So this does not need to be a transaction.
-        itemkey = self._itemkey(value)
-        self._db.delete(self._lease_key_prefix + itemkey, self._session)
+        #itemkey = self._itemkey(value)
+        #self._db.delete(self._lease_key_prefix + itemkey, self._session)
 
 # TODO: add functions to clean up all keys associated with "name" when
 # processing is complete.

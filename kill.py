@@ -15,7 +15,7 @@ from config import *
 parser = argparse.ArgumentParser(description='Grab Kill-type flag')
 parser.add_argument('-k', '--killquick', type=int, default=False,
                     help='switch to do a quick kill or track a reason to kill')
-parser.add_argument('-f', '--forgive_threshold', type=int, default=1,
+parser.add_argument('-f', '--forgive_threshold', type=int, default=3,
                     help='max number of times in a row that you forgive for getting a reason to kill')
 parser.add_argument('-r', '--reset', type=int, default=False,
                     help='switch to only reset kill queue to 0')
@@ -48,7 +48,7 @@ if args.killquick:
 else:
     # track for a reason to kill
     empty_count = 0
-    wait_minutes = 5
+    wait_minutes = 60
     print("Watching for empty queues...")
     while empty_count > forgive_threshold:
         if q.size("main")+q.size("complete1") == 0:
