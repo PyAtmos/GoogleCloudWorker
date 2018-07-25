@@ -91,9 +91,31 @@ Install **pip**:
     sudo apt install python python-dev python3 python3-dev
     wget https://bootstrap.pypa.io/get-pip.py
     sudo python get-pip.py
+
+Install other python packages:
+
+    # google cloud packages 
     sudo pip install google-cloud-storage
     sudo pip install cloudstorage
+
+    # other packages 
     sudo pip install redis
+    sudo pip install numpy
+    sudo pip install sqlalchemy
+    sudo pip install pymysql
+
+Install **pyatmos**:
+      
+    # First, move to a clean working area, then checkout this package
+    git clone git@gitlab.com:frontierdevelopmentlab/astrobiology/pyatmos.git
+    
+    # install this python package as a module 
+    cd pyatmos
+    sudo pip install -e . 
+
+Install **docker**:
+    # This is needed for pyatmos
+    sudo apt install docker.io
 
 
 Establish Auth from command line

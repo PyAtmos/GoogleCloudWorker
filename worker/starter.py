@@ -1,15 +1,10 @@
 import time
 import rediswq
 import utilities
-from sql_create import *
+from start import start 
+from sql_client import *
 
 
-start = {
-	"02" : 0.05,
-	"H2" : 0.20,
-	"other" : 0.50,
-	"filler" : 0.25
-	}
 
 increment_dict = {}
 

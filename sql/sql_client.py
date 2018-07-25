@@ -4,7 +4,8 @@
 #https://cloud.google.com/python/getting-started/using-cloud-sql
 
 ####################################################################################################
-from starter import start, increment_dict
+from start import start
+#from starter import increment_dict # remove circular dependency 
 import utilities
 import rediswq
 import argparse
