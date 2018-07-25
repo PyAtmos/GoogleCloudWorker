@@ -34,3 +34,6 @@ else:
     # if we're here, then we're out of the loop...Kill
     q._kill_switch()
     # done
+
+# reset kill queue
+#item = q._db.rpop(q._kill_q_key)

@@ -53,7 +53,7 @@ NOTE: Complete with a K8 Job Object or not? [Preemptible Instances](https://clou
 
 ### Redis Task Queue
 
-**Install Redis**
+**Install Redis Server**
 [Link](https://cloud.google.com/community/tutorials/setting-up-redis)
 
 Create VM Instance and SSH into it...
@@ -68,14 +68,14 @@ Create VM Instance and SSH into it...
     #now any IP Address can touch the redis instance
     #Redis accepts remote connections on TCP port 6379
 
-    #open close ssh shell
+    #restart the service:
     $ sudo service redis-server restart
 
 
 Try and 'ping' the Redis server...
 First find the "REDIS_IPV4_ADDRESS" by finding the "external* IP address" of the Redis VM Instance. *I tried 'external' and it didn't work; but 'internal IP address' did.
 
-    $ redis-cli -h [REDIS_IPV4_ADDRESS] ping
+    $ redis-cli -h 10.138.0.21 ping
     #did you get pong?
 
 
@@ -95,6 +95,14 @@ Install **pip**:
     sudo pip install cloudstorage
     sudo pip install redis
 
+
+Establish Auth from command line
+
+    $ gcloud auth login
+
+
+
+
 *See References Section bellow for any links + code mentioned*
 
 Will need a *Pod* (or *Demployment*?) K8 Object and a *Service* Object for the Redis Task Queue.
@@ -111,7 +119,20 @@ Start service with...
 
 ### Cloud SQL
 
+i-agility-205814:us-west1:kuber-db-test-rodd
+
+mysql+mysqldb://root@/kuber-db-test-rodd?unix_socket=/cloudsql/i-agility-205814:kuber-db-test-rodd
+
+a = ('mysql+pymysql://{user}:{password}@35.197.109.206/{database}').format(
+            user=CLOUDSQL_USER, password=CLOUDSQL_PASSWORD,
+            database=CLOUDSQL_DATABASE)
+
+Google Cloud documentation to set up [access through IP Address](https://cloud.google.com/sql/docs/mysql/connect-external-app#appaccessIP)
+
+[Other](http://docs.sqlalchemy.org/en/latest/dialects/mysql.html#using-mysqldb-with-google-cloud-sql)
+
 Here is the link to the Database I already made for testing...[**kuber-db-test-rodd**](https://console.cloud.google.com/sql/instances/kuber-db-test-rodd/overview?project=i-agility-205814&duration=PT1H)
+
 
 Reference 5 gave some hints on how to connect to Cloud SQL but they were also doing it through/with a other python packages (Flask) since they wanted to host a webpage or something. Here is the snippit of code, copy n pasted, that gives the info...Sourced from the config.py file...
 
@@ -128,6 +149,10 @@ Reference 5 gave some hints on how to connect to Cloud SQL but they were also do
         'mysql+pymysql://{user}:{password}@127.0.0.1:3306/{database}').format(
             user=CLOUDSQL_USER, password=CLOUDSQL_PASSWORD,
             database=CLOUDSQL_DATABASE)
+
+I got this error after trying to connect to the Cloud SQL database...
+*"2018/07/24 21:18:24 the default Compute Engine service account is not configured with sufficient permissions to access the Cloud SQL API from this VM. Please create a new VM with Cloud SQL access (scope) enabled under "Identity and API access". Alternatively, create a new "service account key" and specify it using the -credential_file parameter"*
+
 
 So I still need to figure out the best way to connect the sqlalchemy stuff to the GCE SQL database that is linked above.
 
