@@ -7,6 +7,7 @@ import time
 
 # SCRIPTS
 import rediswq
+from config import *
 
 
 ####################
@@ -29,7 +30,8 @@ q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 ####################
 ### Reset Kill Queue to 0
 if args.reset:
-    item = q._db.rpop(q._kill_q_key)
+    #item = q._db.rpop(q._kill_q_key)
+    q._db.flushdb() #Delete all keys in the current database
     exit()
 else:
     pass
