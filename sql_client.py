@@ -28,6 +28,8 @@ parser.add_argument('-m', '--master', type=int, default=False,
                     help='if nonzero, assigns node to do the "masters" work')
 parser.add_argument('-r', '--reset', type=int, default=False,
                     help='if nonzero, delete existing tables and create new')
+parser.add_argument('-c', '--create', type=int, default=False,
+                    help='if nonzero, assume no tables exist and create new')
 args = parser.parse_args()
 
 
@@ -66,13 +68,17 @@ class ParameterSpace(Base):
         self.start_time = datetime.utcnow()
 
 if args.reset:
-    print("Deleting old table and creating new one")
+    print("Deleting old table...")
     # delete any old table there
     ParameterSpace.__table__.drop(engine)
+else:
+    pass
+if args.create or args.reset:
+    print("Creating table...")
     # Create all tables in the engine. This is equivalent to "Create Table" statements in raw SQL.
     Base.metadata.create_all(engine)
 else:
-    print("Grabbing old existing table")
+    print("Grabbing existing table...")
     pass
 
 
