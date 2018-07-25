@@ -14,7 +14,7 @@ def param_encode(param_dict):
         concentration = param_dict[molecule]
         param_str += str(concentration)
         param_str += ","
-    param_str = param_str[-1] #remove trailing comma
+    param_str = param_str[:-1] #remove trailing comma
     return param_str
 
 def param_decode(param_str):
