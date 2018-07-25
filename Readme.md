@@ -161,6 +161,7 @@ Standard MySQL port: **3306**
 2. Set up VM Instance to be 'SQL Client'
 
  * Go to Compute Engine -> VM Instance, and create a new instance with Linux Debian
+
 Notes on connecting with mysql for a quick view...
 
     $ gcloud sql connect SERVERNAME --user=root
