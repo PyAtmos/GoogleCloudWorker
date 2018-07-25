@@ -74,9 +74,15 @@ Base.metadata.create_all(engine)
 ####################
 ### SQL Read + Write Functions
 
-def add_db(param_dict):
+def add_db(data, dtype="dict"):
     # Insert a Person in the person table
-    point = ParameterSpace(param_dict)
+    if dtype == "dict":
+        dicted = data
+    elif dtype == "code":
+        dicted = utilities.param_decode(data)
+    else:
+        return "didn't recognize 'dtype'"
+    point = ParameterSpace(dicted)
     session.add(point)
     session.commit()
     return "added to db: %s" % point.hash

@@ -4,6 +4,9 @@
 # SCRIPTS
 from config import *
 
+# PACKAGES
+import hashlib
+
 
 ####################
 ### Parameter Conversions
