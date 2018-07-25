@@ -26,6 +26,8 @@ from sqlalchemy.sql import exists#, filter_by
 parser = argparse.ArgumentParser(description='Grab Master flag')
 parser.add_argument('-m', '--master', type=int, default=False,
                     help='if nonzero, assigns node to do the "masters" work')
+parser.add_argument('-r', '--reset', type=int, default=False,
+                    help='if nonzero, delete existing tables and create new')
 args = parser.parse_args()
 
 
@@ -63,11 +65,15 @@ class ParameterSpace(Base):
         self.state = "Queue"
         self.start_time = datetime.utcnow()
 
-# delete any old table there
-#ParameterSpace.__table__.drop(engine)
-
-# Create all tables in the engine. This is equivalent to "Create Table" statements in raw SQL.
-Base.metadata.create_all(engine)
+if args.reset():
+    print("Deleting old table and creating new one")
+    # delete any old table there
+    ParameterSpace.__table__.drop(engine)
+    # Create all tables in the engine. This is equivalent to "Create Table" statements in raw SQL.
+    Base.metadata.create_all(engine)
+else:
+    print("Grabbing old existing table")
+    pass
 
 
 
@@ -85,7 +91,7 @@ def add_db(data, dtype="dict"):
     point = ParameterSpace(dicted)
     session.add(point)
     session.commit()
-    return "added to db: %s" % point.hash
+    return "added: %s" % point.hash
 
 def run_db(data, dtype="dict"):
     if dtype == "dict":
@@ -99,7 +105,7 @@ def run_db(data, dtype="dict"):
     point.state = "Running"
     point.start_time = datetime.utcnow()
     session.commit()
-    return "running %s" % point.hash
+    return "running: %s" % point.hash
 
 def error_db(msg, data, dtype="dict"):
     if dtype == "dict":
@@ -114,7 +120,7 @@ def error_db(msg, data, dtype="dict"):
     point.error_msg = str(msg) #<-exapnd on this
     point.end_time = datetime.utcnow()
     session.commit()
-    return "%s errored: %s" % (point.hash, msg)
+    return "errored: %s - %s" % (point.hash, msg)
 
 def complete_db(msg, data, dtype="dict"):
     if dtype == "dict":
@@ -129,7 +135,7 @@ def complete_db(msg, data, dtype="dict"):
     point.complete_msg = str(msg) #<-exapnd on this
     point.end_time = datetime.utcnow()
     session.commit()
-    return "%s completed: %s" % (point.hash, msg)
+    return "completed: %s - %s" % (point.hash, msg)
 
 
 def delete_db(data, dtype="dict"):
@@ -143,7 +149,7 @@ def delete_db(data, dtype="dict"):
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
     session.delete(point)
     session.commit()
-    return "deleted %s" % point.hash
+    return "deleted: %s" % point.hash
 
 def exists_db(data, dtype="dict"):
     if dtype == "dict":
@@ -182,7 +188,7 @@ if not args.master:
         if q.size("error") != 0:
             item = q.get("error")
             param_code = item.decode("utf=8")
-            msg = error_db(data=param_code, dtype="code")
+            msg = error_db(msg="unknown", data=param_code, dtype="code")
             print(msg)
             #q.complete(item)
         else:
@@ -190,7 +196,7 @@ if not args.master:
         if q.size("complete0"):
             item = q.get("complete0")
             param_code = item.decode("utf=8")
-            msg = complete_db(msg="UnStable", data=param_code, dtype="code")
+            msg = complete_db(msg="unstable", data=param_code, dtype="code")
             print(msg)
         else:
             pass
@@ -202,7 +208,7 @@ else: #master True
         if q.size("complete1") != 0:
             item = q.get("complete1")
             param_code = item.decode("utf=8")
-            msg = complete_db(msg="Stable", data=param_code, dtype="code")
+            msg = complete_db(msg="stable", data=param_code, dtype="code")
             print(msg)
             '''
             param_dict = utilities.param_decode(param_code)
