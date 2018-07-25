@@ -161,22 +161,22 @@ Standard MySQL port: **3306**
 2. Set up VM Instance to be 'SQL Client'
 
  * Go to Compute Engine -> VM Instance, and create a new instance with Linux Debian
- * Notes on connecting with mysql for a quick view...BE SURE ALL LOWERCASE:
+ * Notes on connecting with mysql for a quick view:
 
-    $ gcloud sql connect /<server name/> --user=root
+    $ gcloud sql connect SERVERNAME --user=root
     #enter password
-    MySQL [(none)]> Use <db name>;
-    MySQL [db name]> Select * from <table name>;
+    MySQL [(none)]> Use DBNAME;
+    MySQL [db name]> Select * from TABLENAME;
 
  * And here is how to connect via python and sqlalchemy:
 
     Base = declarative_base()
-    dbFilePath = 'mysql+pymysql://root:<password>@<sql server ip>:3306/<db name>'
+    dbFilePath = 'mysql+pymysql://root:PASSWORD@SQLSERVERIP:3306/DBNAME'
     engine = create_engine(dbFilePath, echo=False)
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
-    class <class name>(Base):
-        __tablename__ = '<table name>'
+    class custom_class_name(Base):
+        __tablename__ = 'TABLENAME'
         #...
     Base.metadata.create_all(engine)
 
