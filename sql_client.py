@@ -56,7 +56,7 @@ class ParameterSpace(Base):
     out_path = Column(String(32))
     #
     def __init__(self, parameter_dict):
-        self.hash = utilites.param_hash(parameter_dict)
+        self.hash = utilities.param_hash(parameter_dict)
         self.H2 = parameter_dict['H2']
         self.O2 = parameter_dict['O2']
         #...
@@ -64,7 +64,7 @@ class ParameterSpace(Base):
         self.start_time = datetime.utcnow()
 
 # delete any old table there
-ParameterSpace.__table__.drop(engine)
+#ParameterSpace.__table__.drop(engine)
 
 # Create all tables in the engine. This is equivalent to "Create Table" statements in raw SQL.
 Base.metadata.create_all(engine)
