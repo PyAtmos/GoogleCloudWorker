@@ -180,7 +180,7 @@ if not args.master:
     print("Created normal SQL Client")
     while not q.kill():
         if q.size("run")+q.size("error")+q.size("complete0") == 0:
-            time.sleep(30) # kill time
+            time.sleep(5) # kill time
         else:
             pass
 
@@ -211,6 +211,10 @@ if not args.master:
 else: #master True
     print("Created Master Client")
     while not q.kill():
+        if q.size("copmlete1")+q.size("main sql") == 0:
+            time.sleep(5) # kill time
+        else:
+            pass
         if q.size("complete1") != 0:
             item = q.get("complete1")
             param_code = item.decode("utf=8")

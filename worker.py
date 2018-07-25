@@ -56,4 +56,4 @@ while not q.kill():
                 q.put(value=param_code, queue="complete0")
     else:
         print("Waiting for work")
-        time.sleep(10)
+        time.sleep(5)
