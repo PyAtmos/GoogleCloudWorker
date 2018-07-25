@@ -141,13 +141,13 @@ Start service with...
 
 ### Cloud SQL
 
-Server: [**Link**]()
+Server: [**Link**](https://console.cloud.google.com/sql/instances?project=i-agility-205814)
 
-Connection Name:
+Connection Name: **i-agility-205814:us-west1:sql-server**
 
-Database Name
+Database Name: **pyatmos**
 
-Server IP Address:
+Server IP Address: **35.233.245.129**
 
 Standard MySQL port: **3306**
 

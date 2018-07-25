@@ -1,17 +1,10 @@
-import time
 import rediswq
 import utilities
-from start import start 
-from sql_client import *
-
-
-
-increment_dict = {}
-
+from config import *
 
 # add 'start' to the sql db
 ret = add_db(start)
 
 # add 'start' to task_queue
-q = rediswq.RedisWQ(name="job2", host=utilities.redis_host)
+q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 q.put(value=param_str_enc(start), queue="main sql")

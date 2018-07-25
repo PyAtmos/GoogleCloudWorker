@@ -1,14 +1,11 @@
 #!/usr/bin/env python
-
 # SOURCE:
 #https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
 
-####################################################################################################
-# Based on http://peter-hoffmann.com/2012/python-simple-queue-redis-queue.html 
-# and the suggestion in the redis documentation for RPOPLPUSH, at 
-# http://redis.io/commands/rpoplpush, which suggests how to implement a work-queue.
+# this is a huge frankenstein's monster of messy original^ code with rodd's hacks added in
 
- 
+####################################################################################################
+# PACKAGES
 import redis
 import uuid
 import hashlib
@@ -31,7 +28,7 @@ class RedisWQ(object):
        The work queue is identified by "name".  The library may create other
        keys with "name" as a prefix. 
        """
-       self._db = redis.StrictRedis(**redis_kwargs)#
+       self._db = redis.StrictRedis(**redis_kwargs)
        # The session ID will uniquely identify this "worker".
        self._session = str(uuid.uuid4())
        # Work queue is implemented as two queues: main, and processing.
@@ -61,6 +58,7 @@ class RedisWQ(object):
         """Return the size of the main queue."""
         return self._db.llen(self._processing_q_key)
 
+    # rodd added:
     def size(self, q):
         if q == "main":
             return self._db.llen(self._main_q_key)
@@ -75,9 +73,11 @@ class RedisWQ(object):
         elif q == "complete1":
             return self._db.llen(self._complete1_sql_q_key)
 
+    # rodd added:
     def _kill_switch(self):
         self._db.lpush(self._kill_q_key, "1")
 
+    # rodd added:
     def kill(self):
         return self._db.llen(self._kill_q_key) > 0
 
@@ -110,10 +110,6 @@ class RedisWQ(object):
     def _lease_exists(self, item):
         """True if a lease on 'item' exists."""
         return self._db.exists(self._lease_key_prefix + self._itemkey(item))
-
-    
-    #def pre_queue(self):
-
 
     def to_queue(self):
         item = self._db.rpoplpush(self._main_sql_q_key, self._main_q_key)
@@ -157,6 +153,7 @@ class RedisWQ(object):
         elif queue == "complete1":
             self._db.lpush(self._complete1_sql_q_key, value)
 
+    # rodd added:
     def get(self, queue):
         if queue == "main":
             item = self._db.rpop(self._main_q_key)

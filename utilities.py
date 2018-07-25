@@ -1,9 +1,8 @@
 # utility file for keeping consistent language in handling parameters
-from stater import start
 
-
-# Declare redis.host
-redis_host = "10.138.0.21"
+####################################################################################################
+# SCRIPTS
+from config import *
 
 
 ####################
@@ -35,7 +34,6 @@ def param_hash(param_dict):
     return hash_object.hexdigest()
 
 
-
 ####################
 ### Build Functions
 def round_partial(value, resolution):
@@ -49,6 +47,7 @@ def calc_filler(param_dict):
         else:
             continue
     return filler
+
 
 ####################
 ### Explore Functions
@@ -122,7 +121,7 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                 # add to main queue and sql queue
                 #redis_db.put(value=neighbor, queue="main")
                 redis_db.put(value=neighbor, queue="main sql")
-
+    
     else:
         # no other search_mode created
         pass

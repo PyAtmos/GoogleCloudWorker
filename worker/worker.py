@@ -1,35 +1,35 @@
 # SOURCE: for only the redis part
 #https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
 
-# packages
+
+####################################################################################################
+# PACKAGES
 import numpy as np
 import hashlib
 from copy import deepcopy
 import os
 import sys
 import time
-from datetime import datetime
-
-# pyatmos  
+from datetime import datetime 
 import pyatmos 
 
-
-# scripts
+# SCRIPTS
 import rediswq
 import utilities
-from starter import start
+from config import *
 
 
-
-q = rediswq.RedisWQ(name="job2", host=utilities.redis_host)
+####################
+### Start the Worker
+q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 while not q.kill():
+    # grab next set of param off queue
     item = q.lease(lease_secs=10, block=True, timeout=2) #CHANGE? the lease n timeout?
     if item is not None:
         param_code = item.decode("utf=8")
         q.put(value=param_code, queue="run")
-        #sql.run_db(data=input_parameters)
         param_dict = utilities.param_decode(param_code)
-
+        param_hash = utilities.param_hash(param_dict)
         '''
         PYATMOS GOES HERE
         '''
@@ -38,17 +38,12 @@ while not q.kill():
         atmos.start()
         run_code = atmos.run(species_concentrations={}, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
 
-
-        #q.complete(item)
+        # remove item off processing queue
+        q.complete(item)
         if errored:
             q.put(value=param_code, queue="error")
-            #sql.error_db(msg, data=input_parameters)
         else:
-            #q.put(value=itemstr, queue="complete")
-            #sql.complete_db(msg, data=input_parameters)
             if stable:
-                # find neighbors and add to queue
-                #explore(input_parameters, increment_dict, q, step_size=2)
                 q.put(value=param_code, queue="complete1")
                 param_dict = utilities.param_decode(param_code)
                 utilities.explore(
@@ -59,7 +54,6 @@ while not q.kill():
                     search_mode="sides")
             else:
                 q.put(value=param_code, queue="complete0")
-
     else:
         print("Waiting for work")
-print("Queue empty, exiting")
+        time.sleep(10)
