@@ -84,6 +84,10 @@ Install and use **git**:
     sudo apt install git-all
     git clone URL
 
+Write over any local changes with whatever is at remote-origin
+
+    git fetch origin
+    git reset --hard origin/master
 
 Install **pip**:
 
@@ -160,6 +164,7 @@ Standard MySQL port: **3306**
 
 2. Set up VM Instance to be 'SQL Client'
 
+ * Install real [mysql client](https://cloud.google.com/sql/docs/mysql/connect-admin-ip)
  * Go to Compute Engine -> VM Instance, and create a new instance with Linux Debian
 
 Notes on connecting with mysql for a quick view...
