@@ -53,7 +53,7 @@ else:
     while empty_count > forgive_threshold:
         if q.size("main")+q.size("complete1") == 0:
             empty_count += 1
-            print("This is the %d time that we found empty queues\n...sleeping for %dmin before checking again" % (empty_count, wait_minutes)
+            print("This is the %d time that we found empty queues\n...sleeping for %dmin before checking again" % (empty_count, wait_minutes))
             time.sleep(60*wait_minutes)
         else:
             # we got stuff to do so let's reset count!

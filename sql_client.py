@@ -234,14 +234,14 @@ else: #master True
                 for point in points:
                     timedelta = datetime.utcnow() - point.start_time
                     timedelta = timedelta.days * 24 * 3600 + timedelta.seconds
-                        if timedelta > MAX_JOB_RUN_TIME
-                            #add points back to queue
-                            point.state = "Queue"
-                            point.start_time = datetime.utcnow()
-                            q.put(point.code, "main")
-                            session.commit()
-                        else:
-                            pass
+                    if timedelta > MAX_JOB_RUN_TIME:
+                        #add points back to queue
+                        point.state = "Queue"
+                        point.start_time = datetime.utcnow()
+                        q.put(point.code, "main")
+                        session.commit()
+                    else:
+                        pass
             else:
                 pass
             time.sleep(5) # kill time
