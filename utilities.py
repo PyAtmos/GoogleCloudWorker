@@ -93,7 +93,8 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                 else:
                     # add to main queue and sql queue
                     #redis_db.put(value=neighbor, queue="main")
-                    redis_db.put(value=neighbor, queue="main sql")
+                    print("adding neighbor: %s" % neighbor)
+                    redis_db.put(value=utilities.param_encode(neighbor), queue="main sql")
 
     elif search_mode == "diagonals":
         # say if we have 's' possible states...s=3 for step_size=1 st we can go +1, +0, or -1.
@@ -127,7 +128,7 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
             else:
                 # add to main queue and sql queue
                 #redis_db.put(value=neighbor, queue="main")
-                redis_db.put(value=neighbor, queue="main sql")
+                redis_db.put(value=utilities.param_encode(neighbor), queue="main sql")
     
     else:
         # no other search_mode created
