@@ -9,12 +9,14 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 ENTRYPOINT ["python3"]
 ##########
-
+COPY ./requirements.txt /home
+COPY ./setup.py /home
+COPY ./pyatmos /home/pyatmos
+COPY ./worker.py /home
+COPY ./rediswq.py /home
+COPY ./utilities.py /home
+COPY ./config.py /home
+WORKDIR /home
 RUN pip install -r requirements.txt
-RUN pip install ./pyatmos/
-COPY ./worker.py /worker.py
-COPY ./rediswq.py /rediswq.py
-COPY ./utilities.py /utilities.py
-COPY ./config.py /config.py
-
+RUN pip install pyatmos
 CMD  python worker.py

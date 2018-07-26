@@ -1,9 +1,7 @@
+setuptools
+docker
+google.cloud
 numpy
 redis
-hashlib
 uuid
-copy
-os
-sys
-time
 datetime
