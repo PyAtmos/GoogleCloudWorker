@@ -20,6 +20,11 @@ from config import *
 
 
 ####################
+### Start PyAtmos
+atmos = pyatmos.Simulation()
+atmos.start()
+
+####################
 ### Start the Worker
 q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 while not q.kill():
@@ -35,8 +40,6 @@ while not q.kill():
 
             ##########PYATMOS##########
             # TESTING
-            atmos = pyatmos.Simulation()
-            atmos.start()
             run_code = atmos.run(species_concentrations={}, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
             ##########PYATMOS##########
 
