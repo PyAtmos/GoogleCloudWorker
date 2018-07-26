@@ -7,6 +7,7 @@ from config import *
 # PACKAGES
 import hashlib
 import numpy as np
+from copy import deepcopy
 
 
 ####################
@@ -71,6 +72,7 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
     steps = np.concatenate((-1*(np.arange(step_size)+1),np.arange(step_size)+1))
     if search_mode == "sides":
         for molecule, concentration in param_dict.items():
+            concentration = float(concentration)
             if molecule in ["other","filler"]:
                 continue
             else:
@@ -100,6 +102,7 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
         # idea, create
         previous_list = [param_dict]
         for molecule, concentration in param_dict:
+            concentration = float(concentration)
             if molecule in ["other","filler"]:
                 continue
             else:
