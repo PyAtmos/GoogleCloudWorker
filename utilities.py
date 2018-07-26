@@ -85,7 +85,11 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                     pass
             for direction in steps:
                 neighbor = deepcopy(param_dict)
-                neighbor[molecule] = round_partial(concentration + direction*increment, increment)
+                val = round_partial(concentration + direction*increment, increment)
+                if val >= 0:
+                    neighbor[molecule] = val
+                else:
+                    continue
                 neighbor["filler"] = calc_filler(neighbor)
                 if neighbor["filler"] < 0:
                     # impossible space...don't add
@@ -117,8 +121,12 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                             break
                         else:
                             pass
-                    neigh[molecule] = round_partial(concentration + direction*increment, increment)
-                    next_list.append(neigh)
+                    val = round_partial(concentration + direction*increment, increment)
+                    if val >= 0:
+                        neigh[molecule] = val
+                        next_list.append(neigh)
+                    else:
+                        continue
         # now have a list of all possible neighboring points
         for neighbor in next_list:
             neighbor["filler"] = calc_filler(neighbor)
