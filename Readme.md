@@ -4,9 +4,24 @@
 
 The goal of this is to create the infrastructure to take a containerized program, scale it to a large N number of nodes, but to still retain some sort of communication between resources as to what jobs should be run...super vague (and maybe not properly worded) but that'll further be explained in the next section I'm sure.
 
-NOTE: **PyAtmos Image** using the 'old' version of Atmos...
+NOTE: **Atmos Image** using the 'old' version of Atmos...
 
-gcr.io/i-agility-205814/pyatmos_docker
+**Atmos**: gcr.io/i-agility-205814/pyatmos_docker <-bad name but indeed is Atmos
+
+**Worker + PyAtmos**: gcr.io/i-agility-205814/pyatmos_worker
+
+How to build the Pyatmos worker image:
+
+ * create vm instance with docker installed (instance 1 should have it)
+ * git clone kuber-master repo
+ * cd into kuber-master
+ * git clone pyatmos repo
+ * $ gcloud auth login
+ * $ gcloud builds submit --tag gcr.io/i-agility-205814/pyatmos_worker .
+ * boom done
+
+
+
 
 ## Outline
 
