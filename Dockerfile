@@ -10,7 +10,6 @@ RUN apt-get update \
 ENTRYPOINT ["python3"]
 ##########
 COPY ./requirements.txt /home
-COPY ./setup.py /home
 COPY ./pyatmos /home/pyatmos
 COPY ./worker.py /home
 COPY ./rediswq.py /home
@@ -18,5 +17,5 @@ COPY ./utilities.py /home
 COPY ./config.py /home
 WORKDIR /home
 RUN pip install -r requirements.txt
-RUN pip install pyatmos
-CMD  python worker.py
+RUN pip install pyatmos/.
+CMD python worker.py
