@@ -42,7 +42,7 @@ def param_hash(param_dict):
 ####################
 ### Build Functions
 def round_partial(value, resolution):
-    return round(float(value)/float(resolution), resolution)
+    return round(float(value)/float(resolution)) * resolution
 
 def calc_filler(param_dict):
     filler = 1 # starting point
