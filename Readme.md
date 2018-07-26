@@ -4,6 +4,10 @@
 
 The goal of this is to create the infrastructure to take a containerized program, scale it to a large N number of nodes, but to still retain some sort of communication between resources as to what jobs should be run...super vague (and maybe not properly worded) but that'll further be explained in the next section I'm sure.
 
+NOTE: **PyAtmos Image** using the 'old' version of Atmos...
+
+gcr.io/i-agility-205814/pyatmos_docker
+
 ## Outline
 
 Right now this is built for scaling the Atmos program (Fortran) and the Python wrapper that triggers and customizes the Atmos run. See [**Pyatmos** repo](https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos).

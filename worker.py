@@ -11,6 +11,7 @@ import os
 import sys
 import time
 from datetime import datetime
+
 import pyatmos 
 
 # SCRIPTS
@@ -21,7 +22,8 @@ from config import *
 
 ####################
 ### Start PyAtmos
-atmos = pyatmos.Simulation()
+atmos = pyatmos.Simulation(docker_image="gcr.io/i-agility-205814/pyatmos_docker")
+# above docker image uses the 'old' version of atmos
 atmos.start()
 
 ####################
@@ -40,7 +42,7 @@ while not q.kill():
 
             ##########PYATMOS##########
             # TESTING
-            run_code = atmos.run(species_concentrations={}, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
+            run_code = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
             ##########PYATMOS##########
 
             # remove item off processing/lease queue

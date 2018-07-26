@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: pyatmos-jobs
 spec:
-  parallelism: 2
+  parallelism: 2000
   template:
     metadata:
       name: pyatmos-jobs
