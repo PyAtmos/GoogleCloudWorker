@@ -6,6 +6,7 @@ from config import *
 
 # PACKAGES
 import hashlib
+import numpy as np
 
 
 ####################

@@ -195,7 +195,7 @@ if not args.master:
         if q.size("run") != 0:
             item = q.get("run")
             if item:
-                param_code = item.decode("utf=8")
+                param_code = item#.decode("utf=8")
                 msg = run_db(data=param_code, dtype="code")
                 print(msg)
             else:
@@ -205,7 +205,7 @@ if not args.master:
         if q.size("error") != 0:
             item = q.get("error")
             if item:
-                param_code = item.decode("utf=8")
+                param_code = item#.decode("utf=8")
                 msg = error_db(msg="unknown", data=param_code, dtype="code")
                 print(msg)
                 #q.complete(item)
@@ -216,7 +216,7 @@ if not args.master:
         if q.size("complete0"):
             item = q.get("complete0")
             if item:
-                param_code = item.decode("utf=8")
+                param_code = item#.decode("utf=8")
                 msg = complete_db(msg="unstable", data=param_code, dtype="code")
                 print(msg)
             else:
@@ -228,7 +228,7 @@ if not args.master:
 else: #master True
     print("Created Master Client")
     while not q.kill():
-        if q.size("copmlete1")+q.size("main sql") == 0:
+        if q.size("complete1")+q.size("main sql") == 0:
             if q.size("main") == 0:
                 points = session.query(ParameterSpace).filter_by(state='running')
                 for point in points:
@@ -250,7 +250,7 @@ else: #master True
         if q.size("complete1") != 0:
             item = q.get("complete1")
             if item:
-                param_code = item.decode("utf=8")
+                param_code = item#.decode("utf=8")
                 msg = complete_db(msg="stable", data=param_code, dtype="code")
                 print(msg)
                 '''
@@ -269,7 +269,7 @@ else: #master True
             if q.size("main sql") != 0:
                 item = q.get("main sql")
                 if item:
-                    param_code = item.decode("utf=8")
+                    param_code = item#.decode("utf=8")
                     if not exists_db(param_code, dtype="code"):#check if item in DB already
                         msg = add_db(data=param_code, dtype="code")
                         q.put(param_code, "main")

@@ -28,7 +28,7 @@ while not q.kill():
         lease_secs = 60*60*12
         item = q.lease(lease_secs=lease_secs, block=False)
         if item is not None:
-            param_code = item.decode("utf=8")
+            #param_code = item.decode("utf=8")
             q.put(value=param_code, queue="run")
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
@@ -52,7 +52,7 @@ while not q.kill():
                         param_dict=param_dict,
                         increment_dict=increment_dict,
                         redis_db=q,
-                        step_Size=2,
+                        step_size=2,
                         search_mode="sides")
                 else:
                     q.put(value=param_code, queue="complete0")
