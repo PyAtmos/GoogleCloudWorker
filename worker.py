@@ -35,7 +35,7 @@ while not q.kill():
         lease_secs = 60*60*12
         item = q.lease(lease_secs=lease_secs, block=False)
         if item is not None:
-            #param_code = item.decode("utf=8")
+            param_code = item#.decode("utf=8")
             q.put(value=param_code, queue="run")
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
