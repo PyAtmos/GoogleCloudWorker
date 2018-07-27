@@ -33,7 +33,7 @@ while not q.kill():
     if q.size("main") != 0:
         # grab next set of param off queue
         lease_secs = 60*60*12
-        item = q.lease(lease_secs=lease_secs, block=False)
+        item = q.lease(lease_secs=lease_secs, block=False) #make block true w/ timeout 30sec ish
         if item is not None:
             param_code = item#.decode("utf=8")
             q.put(value=param_code, queue="run")
