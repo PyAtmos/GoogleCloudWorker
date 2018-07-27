@@ -47,7 +47,7 @@ def round_partial(value, resolution):
 def calc_filler(param_dict):
     filler = 1 # starting point
     for molecule, concentration in param_dict.items():
-        if molecule not in ["filler"]:
+        if molecule not in ["N2"]:
             filler -= concentration
         else:
             continue
@@ -73,10 +73,10 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
     if search_mode == "sides":
         for molecule, concentration in param_dict.items():
             concentration = float(concentration)
-            if molecule in ["other","filler"]:
-                continue
-            else:
+            if molecule in ALTER_MOLECULES: #["other","filler"]:
                 pass
+            else:
+                continue
             # look up how much we can increment the molecule based off it's concentration
             for max_conc, increment in increment_dict[molecule].items():
                 if concentration < max_conc:
@@ -90,8 +90,8 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                     neighbor[molecule] = val
                 else:
                     continue
-                neighbor["filler"] = calc_filler(neighbor)
-                if neighbor["filler"] < 0:
+                neighbor["N2"] = calc_filler(neighbor)
+                if neighbor["N2"] < 0:
                     # impossible space...don't add
                     continue
                 else:
@@ -108,10 +108,10 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
         previous_list = [param_dict]
         for molecule, concentration in param_dict:
             concentration = float(concentration)
-            if molecule in ["other","filler"]:
-                continue
-            else:
+            if molecule in ALTER_MOLECULES:
                 pass
+            else:
+                continue
             previous_list = deepcopy(next_list)
             for direction in steps:
                 for neighbor in previous_list:
@@ -129,8 +129,8 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                         continue
         # now have a list of all possible neighboring points
         for neighbor in next_list:
-            neighbor["filler"] = calc_filler(neighbor)
-            if neighbor["filler"] < 0:
+            neighbor["N2"] = calc_filler(neighbor)
+            if neighbor["N2"] < 0:
                 # impossible space...don't add
                 continue
             else:

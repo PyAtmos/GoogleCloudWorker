@@ -265,7 +265,7 @@ else: #master True
                 pass
         else:
             pass
-        for _ in range(2*(len(start)-2)): #...one for each direction and molecule
+        for _ in range(2*(len(ALTER_MOLECULES)-2)): #...one for each direction and molecule
             if q.size("main sql") != 0:
                 item = q.get("main sql")
                 if item:
