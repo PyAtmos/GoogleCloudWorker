@@ -179,106 +179,73 @@ q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 # ^consider making ^decode_responses=True^ so
 # that we don't have to convert binary to unicode for getting items off list
 if not args.master:
-    print("Created normal SQL Client")
+    print("Created Normal Write SQL Client")
     while not q.kill():
-        if q.size("run")+q.size("error")+q.size("complete0") == 0:
-            ##########
-            #FUTURE WORK
-            # if all queues are empty; look up sql table to see how many are state='running'
-            # and see how long they have been running...
-            # if running for 'too long', then assume that the node died mid-run; change state to queue and add to "main"
-            ##########
-            time.sleep(5) # kill time
+
+        item = q.get("run", block=True, timeout=15)
+        if item:
+            param_code = item#.decode("utf=8")
+            msg = run_db(data=param_code, dtype="code")
+            print(msg)
         else:
             pass
 
-        if q.size("run") != 0:
-            item = q.get("run")
-            if item:
-                param_code = item#.decode("utf=8")
-                msg = run_db(data=param_code, dtype="code")
-                print(msg)
-            else:
-                pass
+        item = q.get("error", block=True, timeout=15)
+        if item:
+            param_code = item#.decode("utf=8")
+            msg = error_db(msg="std error", data=param_code, dtype="code")
+            print(msg)
         else:
             pass
-        if q.size("error") != 0:
-            item = q.get("error")
-            if item:
-                param_code = item#.decode("utf=8")
-                msg = error_db(msg="unknown", data=param_code, dtype="code")
-                print(msg)
-                #q.complete(item)
-            else:
-                pass
+
+        item = q.get("complete0", block=True, timeout=15)
+        if item:
+            param_code = item#.decode("utf=8")
+            msg = complete_db(msg="unstable", data=param_code, dtype="code")
+            print(msg)
         else:
             pass
-        if q.size("complete0"):
-            item = q.get("complete0")
-            if item:
-                param_code = item#.decode("utf=8")
-                msg = complete_db(msg="unstable", data=param_code, dtype="code")
-                print(msg)
-            else:
-                pass
+
+        item = q.get("complete1", block=True, timeout=15)
+        if item:
+            param_code = item#.decode("utf=8")
+            msg = complete_db(msg="stable", data=param_code, dtype="code")
+            print(msg)
         else:
             pass
 
 
 else: #master True
-    print("Created Master Client")
+    print("Created Master Read/Write SQL Client")
     while not q.kill():
-        if q.size("complete1")+q.size("main sql") == 0:
-            if q.size("main") == 0:
-                points = session.query(ParameterSpace).filter_by(state='running')
-                for point in points:
-                    timedelta = datetime.utcnow() - point.start_time
-                    timedelta = timedelta.days * 24 * 3600 + timedelta.seconds
-                    if timedelta > MAX_JOB_RUN_TIME:
-                        #add points back to queue
-                        point.state = "Queue"
-                        point.start_time = datetime.utcnow()
-                        q.put(point.code, "main")
-                        session.commit()
-                    else:
-                        pass
-            else:
-                pass
-            time.sleep(5) # kill time
-        else:
-            pass
-        if q.size("complete1") != 0:
-            item = q.get("complete1")
-            if item:
-                param_code = item#.decode("utf=8")
-                msg = complete_db(msg="stable", data=param_code, dtype="code")
-                print(msg)
-                '''
-                param_dict = utilities.param_decode(param_code)
-                utilities.explore(
-                    param_dict=param_dict,
-                    increment_dict=increment_dict,
-                    redis_db=q,
-                    step_Size=2,
-                    search_mode="sides")'''
-            else:
-                pass
-        else:
-            pass
-        for _ in range(2*(len(ALTER_MOLECULES)-2)): #...one for each direction and molecule
-            if q.size("main sql") != 0:
-                item = q.get("main sql")
-                if item:
-                    param_code = item#.decode("utf=8")
-                    if not exists_db(param_code, dtype="code"):#check if item in DB already
-                        msg = add_db(data=param_code, dtype="code")
-                        q.put(param_code, "main")
-                        print(msg)
-                    else:
-                        # already in the DB
-                        pass
+        if q.size("error")+q.size("complete0")+q.size("complete1")+q.size("main sql")+q.size("main") == 0:
+            points = session.query(ParameterSpace).filter_by(state='running')
+            for point in points:
+                timedelta = datetime.utcnow() - point.start_time
+                timedelta = timedelta.days * 24 * 3600 + timedelta.seconds
+                if timedelta > MAX_JOB_RUN_TIME:
+                    #add points back to queue
+                    print("re-queueing: %s - was on for %d seconds" % (point.hash, timedelta))
+                    point.state = "Queue"
+                    point.start_time = datetime.utcnow()
+                    session.commit()
+                    q.put(point.code, "main")
                 else:
                     pass
+        else:
+            pass
+
+        item = q.get("main sql", block=True, timeout=15)
+        if item:
+            param_code = item #.decode("utf=8")
+            if not exists_db(param_code, dtype="code"): #check if item in DB already
+                msg = add_db(data=param_code, dtype="code")
+                q.put(param_code, "main")
+                print(msg)
             else:
-                break
+                # already in the DB
+                pass
+        else:
+            pass
+
 

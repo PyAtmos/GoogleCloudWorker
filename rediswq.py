@@ -115,6 +115,17 @@ class RedisWQ(object):
         item = self._db.rpoplpush(self._main_sql_q_key, self._main_q_key)
         return item
 
+    def buy(self, block=True, timeout=None):
+        """Lite version of lease() that eliminates the actual 'lease' list.
+        Right now, the sql_client already checks for 'running' jobs that never 
+        seems to finish and adds those back into the queue so we don't need a lease list"""
+        if block:
+            item = self._db.brpoplpush(self._main_q_key, self._processing_q_key, timeout=timeout)
+        else:
+            item = self._db.rpoplpush(self._main_q_key, self._processing_q_key)
+        if item:
+            return item
+
     def lease(self, lease_secs=60, block=True, timeout=None):
         """Begin working on an item the work queue. 
 
@@ -128,13 +139,13 @@ class RedisWQ(object):
             item = self._db.brpoplpush(self._main_q_key, self._processing_q_key, timeout=timeout)
         else:
             item = self._db.rpoplpush(self._main_q_key, self._processing_q_key)
-        #if item:
-        #    # Record that we (this session id) are working on a key.  Expire that
-        #    # note after the lease timeout.
-        #    # Note: if we crash at this line of the program, then GC will see no lease
-        #    # for this item a later return it to the main queue.
-        #    itemkey = self._itemkey(item)
-        #    self._db.setex(self._lease_key_prefix + itemkey, lease_secs, self._session)
+        if item:
+            # Record that we (this session id) are working on a key.  Expire that
+            # note after the lease timeout.
+            # Note: if we crash at this line of the program, then GC will see no lease
+            # for this item a later return it to the main queue.
+            itemkey = self._itemkey(item)
+            self._db.setex(self._lease_key_prefix + itemkey, lease_secs, self._session)
         return item
 
     # rodd added:
@@ -154,19 +165,39 @@ class RedisWQ(object):
             self._db.lpush(self._complete1_sql_q_key, value)
 
     # rodd added:
-    def get(self, queue):
-        if queue == "main":
-            item = self._db.rpop(self._main_q_key)
-        elif queue == "main sql":
-            item = self._db.rpop(self._main_sql_q_key)
-        elif queue == "run":
-            item = self._db.rpop(self._running_sql_q_key)
-        elif queue == "error":
-            item = self._db.rpop(self._error_sql_q_key)
-        elif queue == "complete0":
-            item = self._db.rpop(self._complete0_sql_q_key)
-        elif queue == "complete1":
-            item = self._db.rpop(self._complete1_sql_q_key)
+    def get(self, queue, block=False, timeout=None):
+        if block:
+            if queue == "main":
+                item = self._db.brpop(self._main_q_key)
+            elif queue == "main sql":
+                item = self._db.brpop(self._main_sql_q_key)
+            elif queue == "run":
+                item = self._db.brpop(self._running_sql_q_key)
+            elif queue == "error":
+                item = self._db.brpop(self._error_sql_q_key)
+            elif queue == "complete0":
+                item = self._db.brpop(self._complete0_sql_q_key)
+            elif queue == "complete1":
+                item = self._db.brpop(self._complete1_sql_q_key)
+            else:
+                print("ERROR: not a proper queue name")
+                return 0
+        else:
+            if queue == "main":
+                item = self._db.rpop(self._main_q_key)
+            elif queue == "main sql":
+                item = self._db.rpop(self._main_sql_q_key)
+            elif queue == "run":
+                item = self._db.rpop(self._running_sql_q_key)
+            elif queue == "error":
+                item = self._db.rpop(self._error_sql_q_key)
+            elif queue == "complete0":
+                item = self._db.rpop(self._complete0_sql_q_key)
+            elif queue == "complete1":
+                item = self._db.rpop(self._complete1_sql_q_key)
+            else:
+                print("ERROR: not a proper queue name")
+                return 0
         return item
 
     def complete(self, value):

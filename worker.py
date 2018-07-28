@@ -22,7 +22,7 @@ from config import *
 
 ####################
 ### Start PyAtmos
-atmos = pyatmos.Simulation(docker_image="gcr.io/i-agility-205814/pyatmos_docker")
+atmos = pyatmos.Simulation(docker_image="gcr.io/import-agility-205814/pyatmos_docker")
 # above docker image uses the 'old' version of atmos
 atmos.start()
 
@@ -32,8 +32,7 @@ q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 while not q.kill():
     if q.size("main") != 0:
         # grab next set of param off queue
-        lease_secs = 60*60*12
-        item = q.lease(lease_secs=lease_secs, block=False) #make block true w/ timeout 30sec ish
+        item = q.buy(block=True, timeout=30)
         if item is not None:
             param_code = item#.decode("utf=8")
             q.put(value=param_code, queue="run")
@@ -62,8 +61,10 @@ while not q.kill():
                 else:
                     q.put(value=param_code, queue="complete0")
         else:
-            print("Waiting for work")
-            time.sleep(5)
+            #print("Waiting for work")
+            #time.sleep(5)
+            pass
     else:
-        print("Waiting for work")
-        time.sleep(5)
+        #print("Waiting for work")
+        #time.sleep(5)
+        pass
