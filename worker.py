@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # SOURCE: for only the redis part
 #https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
 

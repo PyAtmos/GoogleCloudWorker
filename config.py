@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # all configuration variables for the entire program
 
 # initial concentrations of gases 
