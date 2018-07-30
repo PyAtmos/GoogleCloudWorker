@@ -19,6 +19,6 @@ WORKDIR /home
 RUN pip install -r requirements.txt
 RUN pip install pyatmos/.
 #CMD python worker.py
-CMD ls -l /var/run/docker.sock
+CMD ls -l /var/run/docker.sock > "/home/fun.txt"
 CMD id -nG
 CMD docker run hello-world
