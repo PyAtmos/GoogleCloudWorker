@@ -22,7 +22,7 @@ from config import *
 
 ####################
 ### Start PyAtmos
-atmos = pyatmos.Simulation(docker_image="gcr.io/import-agility-205814/pyatmos_docker")
+atmos = pyatmos.Simulation(docker_image="gcr.io/i-agility-205814/pyatmos_docker")
 # above docker image uses the 'old' version of atmos
 atmos.start()
 
