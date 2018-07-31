@@ -131,6 +131,41 @@ Make sure you got google cloud auth for docker
 
 
 
+### Prep nodes
+
+First delete any lingering lists from the server from old runs
+
+    $ sudo python3 /home/kuber-master/kill.py -r 1
+
+Launch the sql-client-1 and the sql-client-master-1 instances and run the respective lines. First line is for the first sql client and it also resets the table schema listed in the config.py file.
+
+    $ sudo python3 /home/kuber-master/sql_client.py -r 1
+
+If it's the first time you are creating the table then run
+
+    $ sudo python3 /home/kuber-master/sql_client.py -c 1
+
+And then run the master sql client
+
+    $ sudo python3 /home/kuber-master/sql_client.py -m 1
+
+Then launch the sql-listen node to have an easy way to query the table for updates
+
+    $ gcloud sql connect SERVERNAME --user=root
+    #enter password
+    MySQL [(none)]> Use DBNAME;
+    MySQL [db name]> Select * from TABLENAME;
+
+And as an option, you can run a kill server to automatically kill the workers (doesn't yet kill the node) if it sees things are empty. You can set the forgive threshold with -f...the max number of times you'll forgive the redis queue for being empty.
+
+    $ sudo python3 /home/kuber-master/kill.py -f 2
+
+Or you can start a node and just do a kill switch to instantly kill all workers
+
+    $ sudo python3 /home/kuber-master/kill.py -k 1
+
+
+
 
 
 
