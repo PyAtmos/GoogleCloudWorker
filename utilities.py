@@ -40,6 +40,32 @@ def param_hash(param_dict):
     hash_object = hashlib.md5(str.encode(string))
     return hash_object.hexdigest()
 
+def metadata_encode(meta_dict):
+    meta_str = ""
+    for key in ATMOS_METADATA:
+        meta_str += str(meta_dict[key])
+        meta_str += ','
+    meta_str = meta_str[:-1] #remove trailing comma
+    return meta_str
+
+def metadata_decode(meta_str):
+    meta_list = meta_str.split(",")
+    meta_dict = {}
+    for i, key in enumerate(ATMOS_METADATA):
+        meta_dict[key] = meta_list[i]
+    return meta_dict
+
+def pack_items(item_list):
+    # take a list of items and pack them into a string separated by a semicolon
+    packed = ';'.join(map(str, item_list))
+    return packed
+
+def unpack_items(packed_items):
+    unpacked = packed_items.split(";")
+    return unpacked
+
+
+
 
 ####################
 ### Build Functions
@@ -101,7 +127,8 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                     # add to main queue and sql queue
                     #redis_db.put(value=neighbor, queue="main")
                     print("adding neighbor: %s" % neighbor)
-                    redis_db.put(value=param_encode(neighbor), queue="main sql")
+                    packed_list = pack_items( [param_encode(neighbor),param_encode(param_dict)] )
+                    redis_db.put(value=packed_list, queue="main sql")
 
     elif search_mode == "diagonals":
         # say if we have 's' possible states...s=3 for step_size=1 st we can go +1, +0, or -1.
@@ -139,7 +166,8 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
             else:
                 # add to main queue and sql queue
                 #redis_db.put(value=neighbor, queue="main")
-                redis_db.put(value=param_encode(neighbor), queue="main sql")
+                packed_list = pack_items( [param_encode(neighbor),param_encode(param_dict)] )
+                redis_db.put(value=packed_list, queue="main sql")
     
     else:
         # no other search_mode created

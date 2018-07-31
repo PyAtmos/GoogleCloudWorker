@@ -44,11 +44,14 @@ q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 while not q.kill():
     if q.size("main") != 0:
         # grab next set of param off queue
-        param_code = q.buy(block=True, timeout=30)
+        packed_code = q.buy(block=True, timeout=30)
         if param_code is not None:
+            param_code, prev_param_code = utilities.unpack_items(packed_code)
             q.put(value=param_code, queue="run")
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
+            prev_param_dict = utilities.param_decode(prev_param_code)
+            prev_param_hash = utilities.param_hash(prev_param_dict)
 
             ###########################
             # Get the previous solutions file pyatmos run! 
@@ -115,7 +118,7 @@ while not q.kill():
             # remove item off processing/lease queue
             q.complete(param_code)
             q.put(value=packed_output_code, queue="complete")
-            
+
             if stable_atmosphere:
                 param_dict = utilities.param_decode(param_code)
                 utilities.explore(

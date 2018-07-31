@@ -41,9 +41,10 @@ class RedisWQ(object):
        self._lease_key_prefix = name + ":leased_by_session:"
 
        self._running_sql_q_key = name + ":sql:running"
-       self._error_sql_q_key = name + ":sql:error"
-       self._complete0_sql_q_key = name + ":sql:complete0"
-       self._complete1_sql_q_key = name + ":sql:complete1"
+       self._complete_sql_q_key = name + ":sql:complete"
+       #self._error_sql_q_key = name + ":sql:error"
+       #self._complete0_sql_q_key = name + ":sql:complete0"
+       #self._complete1_sql_q_key = name + ":sql:complete1"
 
        self._kill_q_key = name + ":kill"
 
@@ -67,14 +68,19 @@ class RedisWQ(object):
             return self._db.llen(self._main_sql_q_key)
         elif q == "run":
             return self._db.llen(self._running_sql_q_key)
-        elif q == "error":
-            return self._db.llen(self._error_sql_q_key)
-        elif q == "complete0":
-            return self._db.llen(self._complete0_sql_q_key)
-        elif q == "complete1":
-            return self._db.llen(self._complete1_sql_q_key)
-        elif q == "kill":
-            return self._db.llen(self._kill_q_key)
+        elif q == "complete":
+            return self._db.llen(self._complete_sql_q_key)
+        #elif q == "error":
+        #    return self._db.llen(self._error_sql_q_key)
+        #elif q == "complete0":
+        #    return self._db.llen(self._complete0_sql_q_key)
+        #elif q == "complete1":
+        #    return self._db.llen(self._complete1_sql_q_key)
+        #elif q == "kill":
+        #    return self._db.llen(self._kill_q_key)
+        else:
+            # incorrect q list/key given
+            return None
 
     # rodd added:
     def _kill_switch(self):
@@ -164,12 +170,17 @@ class RedisWQ(object):
             self._db.lpush(self._main_sql_q_key, value)
         elif queue == "run":
             self._db.lpush(self._running_sql_q_key, value)
-        elif queue == "error":
-            self._db.lpush(self._error_sql_q_key, value)
-        elif queue == "complete0":
-            self._db.lpush(self._complete0_sql_q_key, value)
-        elif queue == "complete1":
-            self._db.lpush(self._complete1_sql_q_key, value)
+        elif queue == "complete":
+            self._db.lpush(self._complete_sql_q_key, value)
+        #elif queue == "error":
+        #    self._db.lpush(self._error_sql_q_key, value)
+        #elif queue == "complete0":
+        #    self._db.lpush(self._complete0_sql_q_key, value)
+        #elif queue == "complete1":
+        #    self._db.lpush(self._complete1_sql_q_key, value)
+        else:
+            # incorrect queue given
+            pass
 
     # rodd added:
     def get(self, queue, block=False, timeout=None):
@@ -180,12 +191,14 @@ class RedisWQ(object):
                 item = self._db.brpop(self._main_sql_q_key, timeout)
             elif queue == "run":
                 item = self._db.brpop(self._running_sql_q_key, timeout)
-            elif queue == "error":
-                item = self._db.brpop(self._error_sql_q_key, timeout)
-            elif queue == "complete0":
-                item = self._db.brpop(self._complete0_sql_q_key, timeout)
-            elif queue == "complete1":
-                item = self._db.brpop(self._complete1_sql_q_key, timeout)
+            elif queue == "complete":
+                item = self._db.brpop(self._complete_sql_q_key, timeout)
+            #elif queue == "error":
+            #    item = self._db.brpop(self._error_sql_q_key, timeout)
+            #elif queue == "complete0":
+            #    item = self._db.brpop(self._complete0_sql_q_key, timeout)
+            #elif queue == "complete1":
+            #    item = self._db.brpop(self._complete1_sql_q_key, timeout)
             else:
                 print("ERROR: not a proper queue name")
                 return 0
@@ -200,12 +213,14 @@ class RedisWQ(object):
                 item = self._db.rpop(self._main_sql_q_key)
             elif queue == "run":
                 item = self._db.rpop(self._running_sql_q_key)
-            elif queue == "error":
-                item = self._db.rpop(self._error_sql_q_key)
-            elif queue == "complete0":
-                item = self._db.rpop(self._complete0_sql_q_key)
-            elif queue == "complete1":
-                item = self._db.rpop(self._complete1_sql_q_key)
+            elif queue == "complete":
+                item = self._db.rpop(self._complete_sql_q_key)
+            #elif queue == "error":
+            #    item = self._db.rpop(self._error_sql_q_key)
+            #elif queue == "complete0":
+            #    item = self._db.rpop(self._complete0_sql_q_key)
+            #elif queue == "complete1":
+            #    item = self._db.rpop(self._complete1_sql_q_key)
             else:
                 print("ERROR: not a proper queue name")
                 return 0

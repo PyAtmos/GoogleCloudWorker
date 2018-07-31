@@ -65,11 +65,17 @@ class ParameterSpace(Base):
     CO2 = Column(Float)
     H2 = Column(Float)
     state = Column(String(256))
-    start_time = Column(DateTime)
-    error_msg = Column(String(256))
-    complete_msg = Column(String(256))
-    end_time = Column(DateTime)
-    out_path = Column(String(256))
+    session_start_time = Column(DateTime)
+    session_end_time = Column(DateTime)
+    # atmos metadata
+    stable = Column(String(256))
+    atmos_start_time = Column(String(256))
+    photochem_duration = Column(String(256))
+    photochem_iterations = Column(String(256))
+    clima_duration = Column(String(256))
+    atmos_run_duraton = Column(String(256))
+    input_max_clima_iterations = Column(String(256))
+    input_max_photochem_iterations = Column(String(256))
     #
     def __init__(self, parameter_dict):
         self.hash = utilities.param_hash(parameter_dict)
@@ -80,8 +86,8 @@ class ParameterSpace(Base):
         self.CH4 = parameter_dict['CH4']
         self.CO2 = parameter_dict['CO2']
         self.H2 = parameter_dict['H2']
-        self.state = "Queue"
-        self.start_time = datetime.utcnow()
+        self.state = "queue"
+        self.session_start_time = datetime.utcnow()
 
 if args.reset:
     print("Deleting old table...")
@@ -124,27 +130,27 @@ def run_db(data, dtype="dict"):
     else:
         return "didn't recognize 'dtype'"
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
-    point.state = "Running"
-    point.start_time = datetime.utcnow()
+    point.state = "running"
     session.commit()
     return "running: %s" % point.hash
 
-def error_db(msg, data, dtype="dict"):
-    if dtype == "dict":
-        hashed = utilities.param_hash(data)
-    elif dtype == "code":
-        dicted = utilities.param_decode(data)
-        hashed = utilities.param_hash(dicted)
-    else:
-        return "didn't recognize 'dtype'"
-    point = session.query(ParameterSpace).filter_by(hash=hashed).first()
-    point.state = "Error"
-    point.error_msg = str(msg) #<-exapnd on this
-    point.end_time = datetime.utcnow()
-    session.commit()
-    return "errored: %s - %s" % (point.hash, msg)
+# def error_db(msg, data, dtype="dict"):
+#     if dtype == "dict":
+#         hashed = utilities.param_hash(data)
+#     elif dtype == "code":
+#         dicted = utilities.param_decode(data)
+#         hashed = utilities.param_hash(dicted)
+#     else:
+#         return "didn't recognize 'dtype'"
+#     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
+#     point.state = "Error"
+#     point.error_msg = str(msg) #<-exapnd on this
+#     point.end_time = datetime.utcnow()
+#     session.commit()
+#     return "errored: %s - %s" % (point.hash, msg)
 
-def complete_db(msg, data, dtype="dict"):
+
+def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     if dtype == "dict":
         hashed = utilities.param_hash(data)
     elif dtype == "code":
@@ -153,9 +159,12 @@ def complete_db(msg, data, dtype="dict"):
     else:
         return "didn't recognize 'dtype'"
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
-    point.state = "Complete"
-    point.complete_msg = str(msg) #<-exapnd on this
+    point.state = run_status
+    point.stable = stability
     point.end_time = datetime.utcnow()
+    # metadata
+    for key in ATMOS_METADATA:
+        point.__dict__[key] = metadata_dict[key]
     session.commit()
     return "completed: %s - %s" % (point.hash, msg)
 
@@ -196,13 +205,31 @@ if not args.master:
     print("Created Normal Write SQL Client")
     while not q.kill():
 
-        param_code = q.get("run", block=True, timeout=15)
+        param_code = q.get("run", block=True, timeout=30)
         if param_code is not None:
             msg = run_db(data=param_code, dtype="code")
             print(msg)
         else:
             pass
 
+        packed_code = q.get("complete", block=True, timeout=30)
+        if packed_code is not None:
+            unpacked_list = utilities.unpack_items(packed_code)
+            param_code = unpacked_list[0]
+            atmos_output = unpacked_list[1]
+            stable_atmosphere = unpacked_list[2]
+            metadata_dict = utilities.metadata_decode(unpacked_list[3])
+
+            msg = complete_db(data=param_code,
+                            dtype="code",
+                            run_status=atmos_output,
+                            stability=stable_atmosphere,
+                            metadata_dict=metadata_dict)
+        else:
+            pass
+
+
+        """
         param_code = q.get("error", block=True, timeout=15)
         if param_code is not None:
             msg = error_db(msg="std error", data=param_code, dtype="code")
@@ -222,7 +249,7 @@ if not args.master:
             msg = complete_db(msg="stable", data=param_code, dtype="code")
             print(msg)
         else:
-            pass
+            pass"""
 
 
 else: #master True
@@ -231,13 +258,13 @@ else: #master True
         if q.size("error")+q.size("complete0")+q.size("complete1")+q.size("main sql")+q.size("main") == 0:
             points = session.query(ParameterSpace).filter_by(state='running')
             for point in points:
-                timedelta = datetime.utcnow() - point.start_time
+                timedelta = datetime.utcnow() - point.session_start_time
                 timedelta = timedelta.days * 24 * 3600 + timedelta.seconds
                 if timedelta > MAX_JOB_RUN_TIME:
                     #add points back to queue
                     print("re-queueing: %s - was on for %d seconds" % (point.hash, timedelta))
-                    point.state = "Queue"
-                    point.start_time = datetime.utcnow()
+                    point.state = "queue"
+                    point.session_start_time = datetime.utcnow()
                     session.commit()
                     q.put(point.code, "main")
                 else:
@@ -247,8 +274,9 @@ else: #master True
 
         param_code = q.get("main sql", block=True, timeout=30)
         if param_code is not None:
-            if not exists_db(param_code, dtype="code"): #check if item in DB already
-                msg = add_db(data=param_code, dtype="code")
+            next_param_code, prev_param_code = utilities.unpack_items(param_code)
+            if not exists_db(next_param_code, dtype="code"): #check if item in DB already
+                msg = add_db(data=next_param_code, dtype="code")
                 q.put(param_code, "main")
                 print(msg)
             else:

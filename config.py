@@ -36,6 +36,16 @@ increment_dict = {
 ALTER_MOLECULES = ["O2"]
 
 
+# 'keys' from run_metadata_dict (atmos metadata) that we want to keep and add to sql database
+# see notes in worker.py or pyatmos.Simulation.get_metadata()
+ATMOS_METADATA = ['atmos_start_time',
+                'photochem_duration',
+                'photochem_iterations',
+                'clima_duration',
+                'atmos_run_duraton',
+                'input_max_clima_iterations',
+                'input_max_photochem_iterations']
+
 
 MAX_JOB_RUN_TIME = 5*60*60 #in seconds
 
