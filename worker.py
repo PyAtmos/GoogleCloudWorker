@@ -13,6 +13,7 @@ import os
 import sys
 import time
 from datetime import datetime
+import tempfile
 
 import pyatmos 
 
@@ -57,13 +58,19 @@ while not q.kill():
             ###########################
             # Get the previous solutions file pyatmos run! 
             ###########################
-            # TODO!!!!!!!!!!!!!!!!!!
+            tmp_file_name = None
+            prev_param_hash = None 
+            if prev_param_hash is not None:
+                tmp_file_name = tempfile.NamedTemporaryFile().name 
+                input_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/out.dist' 
+                input_blob.download_to_file(tmp_file_name)
 
             ##########PYATMOS##########
             atmos_output = atmos.run(species_concentrations=param_dict,
                                     max_photochem_iterations=10000,
                                     max_clima_steps=400,
-                                    output_directory=local_output_directory)
+                                    output_directory=local_output_directory,
+                                    input_file_path=tmp_file_name)
             # atmos_output could be 'success', 'photochem_error', 'clima_error'
             stable_atmosphere = ""
             #for now, just assume stable if atmos_output is 'success'
@@ -104,10 +111,10 @@ while not q.kill():
             file_list = os.listdir(local_output_directory)
 
             # upload files to google cloud bucket 
-            blob_output_dir = JOB_STORAGE_PATH + '/' + parah_hash 
+            blob_output_dir = JOB_STORAGE_PATH + '/' + param_hash 
             for file_name in file_list: 
-                blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
-                blob.upload_from_filename(file_name) 
+                output_blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
+                output_blob.upload_from_filename(file_name) 
 
 
             # remove item off processing/lease queue
