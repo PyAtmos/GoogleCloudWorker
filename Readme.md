@@ -117,17 +117,22 @@ And now get git repos
 
     $ sudo git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/kuber-master
     $ cd /home/kuber-master/
+    $ export KUBERDIR=$PWD
+    $ cd /home/
     $ sudo git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos
+    $ cd /home/pyatmos/
+    $ export PYATMOSDIR=$PWD
     $ cd /home/
 
 Install python script dependencies
 
-    $ sudo pip3 install -r /home/kuber-master/requirements.txt
-    $ sudo pip3 install /home/kuber-master/pyatmos/.
+    $ sudo pip3 install -r $KUBERDIR/requirements.txt
+    $ sudo pip3 install $PYATMOSDIR/.
 
 Make sure you got google cloud auth for docker
 
     $ gcloud auth configure-docker
+
 
 
 
