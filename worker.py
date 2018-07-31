@@ -54,11 +54,14 @@ while not q.kill():
             ###########################
             # Get the previous solutions file pyatmos run! 
             ###########################
+            tmp_file_name = None
             # TODO!!!!!!!!!!!!!!!!!!
-            previous_job_hash = '' 
-            tmp_file_name = tempfile.NamedTemporaryFile().name 
-            input_blob = gcs_bucket.blob
-            input_blob.download_to_file(tmp_file_name)
+            # fill previous_job_hash 
+            previous_job_hash = None 
+            if previous_job_hash is not None:
+                tmp_file_name = tempfile.NamedTemporaryFile().name 
+                input_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + previous_job_hash + '/out.dist' 
+                input_blob.download_to_file(tmp_file_name)
 
 
             ##########PYATMOS##########
@@ -71,7 +74,8 @@ while not q.kill():
             atmos_output = atmos.run(species_concentrations=param_dict,
                                     max_photochem_iterations=10000,
                                     max_clima_steps=400,
-                                    output_directory=local_output_directory)
+                                    output_directory=local_output_directory
+                                    input_file_path=tmp_file_name)
             
             stable_atmosphere = ""
             #for now, just assume stable if atmos_output is 'success'
