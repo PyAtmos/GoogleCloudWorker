@@ -156,6 +156,12 @@ Then launch the sql-listen node to have an easy way to query the table for updat
     MySQL [(none)]> Use DBNAME;
     MySQL [db name]> Select * from TABLENAME;
 
+
+Start the process by adding the first point...
+
+    $ sudo python3 starter.py
+
+
 And as an option, you can run a kill server to automatically kill the workers (doesn't yet kill the node) if it sees things are empty. You can set the forgive threshold with -f...the max number of times you'll forgive the redis queue for being empty.
 
     $ sudo python3 /home/kuber-master/kill.py -f 2
@@ -163,7 +169,6 @@ And as an option, you can run a kill server to automatically kill the workers (d
 Or you can start a node and just do a kill switch to instantly kill all workers
 
     $ sudo python3 /home/kuber-master/kill.py -k 1
-
 
 
 
