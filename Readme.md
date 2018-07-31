@@ -70,6 +70,71 @@ Cloud SQL database...Store the following:
 
 NOTE: Complete with a K8 Job Object or not? [Preemptible Instances](https://cloud.google.com/compuhttps://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms)?
 
+
+
+### Worker Node
+
+Set up a 'model' VM Instance that can be converted into an 'image' or 'snapshot' to be thrown into a 'vm instance group'
+
+Open a fresh VM Instance with **Debian** (assumed 9.5 stretch) and run the following...use sudo for EVERYTHING:
+
+    $ cd /home
+
+Let's get Docker first:
+
+    $ sudo apt-get update
+    $ sudo apt-get install \
+     apt-transport-https \
+     ca-certificates \
+     curl \
+     gnupg2 \
+     software-properties-common
+    $ curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+    # Verify that you now have the key with the fingerprint 9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
+    $ sudo apt-key fingerprint 0EBFCD88
+    $ sudo add-apt-repository \
+      "deb [arch=amd64] https://download.docker.com/linux/debian \
+      $(lsb_release -cs) \
+      stable"
+    $ sudo apt-get update
+    $ sudo apt-get install docker-ce
+    # verify that docker is installed
+    $ sudo docker run hello-world
+    # note that it likely won't work without sudo
+
+
+Now go get 'git', 'python', 'pip':
+
+    $ sudo apt-get update
+    $ sudo apt install git-all
+    $ sudo apt update
+    $ sudo apt install python python-dev python3 python3-dev
+    $ sudo wget https://bootstrap.pypa.io/get-pip.py
+    $ sudo python get-pip.py
+    $ sudo python3 get-pip.py
+
+And now get git repos
+
+    $ sudo git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/kuber-master
+    $ cd /home/kuber-master/
+    $ sudo git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos
+    $ cd /home/
+
+Install python script dependencies
+
+    $ sudo pip3 install -r /home/kuber-master/requirements.txt
+    $ sudo pip3 install /home/kuber-master/pyatmos/.
+
+Make sure you got google cloud auth for docker
+
+    $ gcloud auth configure-docker
+
+
+
+
+
+
+
 ### Redis Task Queue
 
 **Install Redis Server**

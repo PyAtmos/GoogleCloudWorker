@@ -1,5 +1,7 @@
 setuptools
 docker
+cloudstorage
+google-cloud-storage
 google.cloud
 numpy
 redis

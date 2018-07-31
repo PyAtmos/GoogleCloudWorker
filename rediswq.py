@@ -73,6 +73,8 @@ class RedisWQ(object):
             return self._db.llen(self._complete0_sql_q_key)
         elif q == "complete1":
             return self._db.llen(self._complete1_sql_q_key)
+        elif q == "kill":
+            return self._db.llen(self._kill_q_key)
 
     # rodd added:
     def _kill_switch(self):
