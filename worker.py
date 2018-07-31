@@ -13,7 +13,6 @@ import os
 import sys
 import time
 from datetime import datetime
-import tempfile
 
 import pyatmos 
 
@@ -46,9 +45,10 @@ while not q.kill():
     if q.size("main") != 0:
         # grab next set of param off queue
         packed_code = q.buy(block=True, timeout=30)
-        if param_code is not None:
+        if packed_code is not None:
             param_code, prev_param_code = utilities.unpack_items(packed_code)
             q.put(value=param_code, queue="run")
+
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
             prev_param_dict = utilities.param_decode(prev_param_code)
@@ -57,29 +57,14 @@ while not q.kill():
             ###########################
             # Get the previous solutions file pyatmos run! 
             ###########################
-            tmp_file_name = None
             # TODO!!!!!!!!!!!!!!!!!!
-            # fill previous_job_hash 
-            previous_job_hash = None 
-            if previous_job_hash is not None:
-                tmp_file_name = tempfile.NamedTemporaryFile().name 
-                input_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + previous_job_hash + '/out.dist' 
-                input_blob.download_to_file(tmp_file_name)
-
 
             ##########PYATMOS##########
-            """
-            possible returned string as atmos_output:
-              'success'
-              'photochem_error'
-              'clima_error' 
-            """
             atmos_output = atmos.run(species_concentrations=param_dict,
                                     max_photochem_iterations=10000,
                                     max_clima_steps=400,
-                                    output_directory=local_output_directory
-                                    input_file_path=tmp_file_name)
-            
+                                    output_directory=local_output_directory)
+            # atmos_output could be 'success', 'photochem_error', 'clima_error'
             stable_atmosphere = ""
             #for now, just assume stable if atmos_output is 'success'
             if atmos_output == "success":
@@ -119,10 +104,10 @@ while not q.kill():
             file_list = os.listdir(local_output_directory)
 
             # upload files to google cloud bucket 
-            blob_output_dir = JOB_STORAGE_PATH + '/' + param_hash 
+            blob_output_dir = JOB_STORAGE_PATH + '/' + parah_hash 
             for file_name in file_list: 
-                output_blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
-                output_blob.upload_from_filename(file_name) 
+                blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
+                blob.upload_from_filename(file_name) 
 
 
             # remove item off processing/lease queue
