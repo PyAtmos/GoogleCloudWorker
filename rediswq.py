@@ -171,17 +171,17 @@ class RedisWQ(object):
     def get(self, queue, block=False, timeout=None):
         if block:
             if queue == "main":
-                item = self._db.brpop(self._main_q_key)
+                item = self._db.brpop(self._main_q_key, timeout)
             elif queue == "main sql":
-                item = self._db.brpop(self._main_sql_q_key)
+                item = self._db.brpop(self._main_sql_q_key, timeout)
             elif queue == "run":
-                item = self._db.brpop(self._running_sql_q_key)
+                item = self._db.brpop(self._running_sql_q_key, timeout)
             elif queue == "error":
-                item = self._db.brpop(self._error_sql_q_key)
+                item = self._db.brpop(self._error_sql_q_key, timeout)
             elif queue == "complete0":
-                item = self._db.brpop(self._complete0_sql_q_key)
+                item = self._db.brpop(self._complete0_sql_q_key, timeout)
             elif queue == "complete1":
-                item = self._db.brpop(self._complete1_sql_q_key)
+                item = self._db.brpop(self._complete1_sql_q_key, timeout)
             else:
                 print("ERROR: not a proper queue name")
                 return 0

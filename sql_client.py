@@ -249,7 +249,7 @@ else: #master True
         else:
             pass
 
-        item = q.get("main sql", block=True, timeout=15)
+        item = q.get("main sql", block=True, timeout=30)
         if item:
             param_code = item #.decode("utf=8")
             if not exists_db(param_code, dtype="code"): #check if item in DB already
