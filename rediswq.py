@@ -185,7 +185,10 @@ class RedisWQ(object):
             else:
                 print("ERROR: not a proper queue name")
                 return 0
-            return item[1] #brpop returns a tuple : (list id, value)
+            if item:
+                return item[1] #brpop returns a tuple : (list id, value)
+            else:
+                return item #item is None so can't [1]
         else:
             if queue == "main":
                 item = self._db.rpop(self._main_q_key)
