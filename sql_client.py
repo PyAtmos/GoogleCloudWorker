@@ -46,13 +46,24 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 class ParameterSpace(Base):
+    """
+    "O2" : 0.21,
+    "N2" : 0.7772982887,
+    "H2O" : 0.0123,
+    "CH4" : 0.00000163,
+    "CO2" : 0.0004,
+    "H2" : 0.0000000813,
+    """
     __tablename__ = 'parameterspace'
     id = Column(Integer, primary_key=True)
     hash = Column(String(256))
     code = String(256)
-    H2 = Column(Float)
     O2 = Column(Float)
-    #...
+    N2 = Column(Float)
+    H2O = Column(Float)
+    CH4 = Column(Float)
+    CO2 = Column(Float)
+    H2 = Column(Float)
     state = Column(String(256))
     start_time = Column(DateTime)
     error_msg = Column(String(256))
@@ -63,9 +74,12 @@ class ParameterSpace(Base):
     def __init__(self, parameter_dict):
         self.hash = utilities.param_hash(parameter_dict)
         self.code = utilities.param_encode(parameter_dict)
-        self.H2 = parameter_dict['H2']
         self.O2 = parameter_dict['O2']
-        #...
+        self.N2 = parameter_dict['N2']
+        self.H2O = parameter_dict['H2O']
+        self.CH4 = parameter_dict['CH4']
+        self.CO2 = parameter_dict['CO2']
+        self.H2 = parameter_dict['H2']
         self.state = "Queue"
         self.start_time = datetime.utcnow()
 
