@@ -185,6 +185,7 @@ class RedisWQ(object):
             else:
                 print("ERROR: not a proper queue name")
                 return 0
+            return item[1] #brpop returns a tuple : (list id, value)
         else:
             if queue == "main":
                 item = self._db.rpop(self._main_q_key)
@@ -201,7 +202,7 @@ class RedisWQ(object):
             else:
                 print("ERROR: not a proper queue name")
                 return 0
-        return item
+            return item
 
     def complete(self, value):
         """Complete working on the item with 'value'.
