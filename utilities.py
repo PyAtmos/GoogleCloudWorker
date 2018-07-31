@@ -49,6 +49,7 @@ def round_partial(value, resolution):
 def calc_filler(param_dict):
     filler = 1 # starting point
     for molecule, concentration in param_dict.items():
+        concentration = float(concentration)
         if molecule not in ["N2"]:
             filler -= concentration
         else:
