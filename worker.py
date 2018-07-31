@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-# SOURCE: for only the redis part
-#https://kubernetes.io/docs/tasks/job/fine-parallel-processing-work-queue/
-
-
 ####################################################################################################
 # PACKAGES
 import numpy as np
@@ -52,72 +48,48 @@ while not q.kill():
 
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
-            prev_param_dict = utilities.param_decode(prev_param_code)
-            prev_param_hash = utilities.param_hash(prev_param_dict)
 
-            ###########################
             # Get the previous solutions file pyatmos run! 
-            ###########################
-            tmp_file_name = None
-            prev_param_hash = None 
-            if prev_param_hash is not None:
+            if prev_param_code == "first run":
+                prev_param_hash = None
+                tmp_file_name = None
+            else:
+                prev_param_dict = utilities.param_decode(prev_param_code)
+                prev_param_hash = utilities.param_hash(prev_param_dict)
                 tmp_file_name = tempfile.NamedTemporaryFile().name 
-                input_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/out.dist' 
+                input_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/out.dist')
                 input_blob.download_to_file(tmp_file_name)
 
-            ##########PYATMOS##########
+            ### Run PYATMOS
             atmos_output = atmos.run(species_concentrations=param_dict,
                                     max_photochem_iterations=10000,
                                     max_clima_steps=400,
                                     output_directory=local_output_directory,
                                     input_file_path=tmp_file_name)
             # atmos_output could be 'success', 'photochem_error', 'clima_error'
-            stable_atmosphere = ""
-            #for now, just assume stable if atmos_output is 'success'
+            stable_atmosphere = "" #for now, just assume stable if atmos_output is 'success'
             if atmos_output == "success":
                 stable_atmosphere = True
             else:
                 # later build out rules to differentiate stable n unstable for a completed run
                 pass
 
-            """
-            atmos run_metadata_dict:
-                'start_time' : self._start_time,
-                'photochem_duration' : self._photochem_duration,
-                'photochem_iterations' : self._n_photochem_iterations,  
-                'clima_duration' : self._clima_duration,
-            #    'clima_iterations' : self._n_clima_iterations, # TO DO, clima iterations not set   
-                'run_duraton' : self._run_time_end - self._run_time_start,
-                'input_max_clima_iterations' : self._max_clima_steps,
-                'input_max_photochem_iterations' : self._max_photochem_iterations,
-            #    'input_species_concentrations' : self._species_concentrations
-
-            see config.py for list of values from run_metadata_dict that we care about
-            """
+            ### Get Atmos Metadata
             atmos.write_metadata(local_output_directory+'/run_metadata.json')
             run_metadata_dict = atmos.get_metadata()
+            # see config.py for list of values from run_metadata_dict that we care about
+            # or go to pyatmos code -> Simulation.get_metadata()
 
-            # pack info to be queued to output
-            metadata_code = utilities.metadata_encode(run_metadata_dict)
-            packed_output_code = utilities.pack_items( [param_code, atmos_output, stable_atmosphere, metadata_code] )
-            # TESTING
-            ##########PYATMOS##########
-
-            ###########################
-            # Store pyatmos results on google cloud 
-            ###########################
-
-            # get list of files in output directory
+            ### Store pyatmos results on google cloud 
             file_list = os.listdir(local_output_directory)
-
-            # upload files to google cloud bucket 
             blob_output_dir = JOB_STORAGE_PATH + '/' + param_hash 
             for file_name in file_list: 
                 output_blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
                 output_blob.upload_from_filename(file_name) 
 
-
             # remove item off processing/lease queue
+            metadata_code = utilities.metadata_encode(run_metadata_dict)
+            packed_output_code = utilities.pack_items( [param_code, atmos_output, stable_atmosphere, metadata_code] )
             q.complete(param_code)
             q.put(value=packed_output_code, queue="complete")
 
@@ -132,10 +104,6 @@ while not q.kill():
             else:
                 pass
         else:
-            #print("Waiting for work")
-            #time.sleep(5)
             pass
     else:
-        #print("Waiting for work")
-        #time.sleep(5)
         pass

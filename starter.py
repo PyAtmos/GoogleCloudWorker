@@ -5,4 +5,5 @@ from config import *
 
 # add 'start' to task_queue
 q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
-q.put(value=utilities.param_encode(start), queue="main sql")
+packed_items = utilities.packed_items( [utilities.param_encode(start), "first run"] )
+q.put(value=packed_items, queue="main sql")
