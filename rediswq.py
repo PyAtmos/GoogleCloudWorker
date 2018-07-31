@@ -126,8 +126,12 @@ class RedisWQ(object):
             item = self._db.brpoplpush(self._main_q_key, self._processing_q_key, timeout=timeout)
         else:
             item = self._db.rpoplpush(self._main_q_key, self._processing_q_key)
-        if item:
-            return item
+
+        if (item is not None) & (type(item)==bytes):
+            item = item.decode("utf=8")
+        else:
+            pass
+        return item
 
     def lease(self, lease_secs=60, block=True, timeout=None):
         """Begin working on an item the work queue. 
@@ -142,7 +146,7 @@ class RedisWQ(object):
             item = self._db.brpoplpush(self._main_q_key, self._processing_q_key, timeout=timeout)
         else:
             item = self._db.rpoplpush(self._main_q_key, self._processing_q_key)
-        if item:
+        if item is not None:
             # Record that we (this session id) are working on a key.  Expire that
             # note after the lease timeout.
             # Note: if we crash at this line of the program, then GC will see no lease
@@ -185,10 +189,10 @@ class RedisWQ(object):
             else:
                 print("ERROR: not a proper queue name")
                 return 0
-            if item:
-                return item[1] #brpop returns a tuple : (list id, value)
+            if item is not None:
+                item = item[1] #brpop returns a tuple : (list id, value)
             else:
-                return item #item is None so can't [1]
+                pass #item is None
         else:
             if queue == "main":
                 item = self._db.rpop(self._main_q_key)
@@ -205,7 +209,11 @@ class RedisWQ(object):
             else:
                 print("ERROR: not a proper queue name")
                 return 0
-            return item
+        if (item is not None) & (type(item)==bytes):
+            item = item.decode("utf=8")
+        else:
+            pass
+        return item
 
     def complete(self, value):
         """Complete working on the item with 'value'.

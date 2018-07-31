@@ -196,33 +196,29 @@ if not args.master:
     print("Created Normal Write SQL Client")
     while not q.kill():
 
-        item = q.get("run", block=True, timeout=15)
-        if item:
-            param_code = item#.decode("utf=8")
+        param_code = q.get("run", block=True, timeout=15)
+        if param_code is not None:
             msg = run_db(data=param_code, dtype="code")
             print(msg)
         else:
             pass
 
-        item = q.get("error", block=True, timeout=15)
-        if item:
-            param_code = item#.decode("utf=8")
+        param_code = q.get("error", block=True, timeout=15)
+        if param_code is not None:
             msg = error_db(msg="std error", data=param_code, dtype="code")
             print(msg)
         else:
             pass
 
-        item = q.get("complete0", block=True, timeout=15)
-        if item:
-            param_code = item#.decode("utf=8")
+        param_code = q.get("complete0", block=True, timeout=15)
+        if param_code is not None:
             msg = complete_db(msg="unstable", data=param_code, dtype="code")
             print(msg)
         else:
             pass
 
-        item = q.get("complete1", block=True, timeout=15)
-        if item:
-            param_code = item#.decode("utf=8")
+        param_code = q.get("complete1", block=True, timeout=15)
+        if param_code is not None:
             msg = complete_db(msg="stable", data=param_code, dtype="code")
             print(msg)
         else:
@@ -249,9 +245,8 @@ else: #master True
         else:
             pass
 
-        item = q.get("main sql", block=True, timeout=30)
-        if item:
-            param_code = item #.decode("utf=8")
+        param_code = q.get("main sql", block=True, timeout=30)
+        if param_code is not None:
             if not exists_db(param_code, dtype="code"): #check if item in DB already
                 msg = add_db(data=param_code, dtype="code")
                 q.put(param_code, "main")

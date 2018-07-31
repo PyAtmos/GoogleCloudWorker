@@ -34,21 +34,27 @@ q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 while not q.kill():
     if q.size("main") != 0:
         # grab next set of param off queue
-        item = q.buy(block=True, timeout=30)
-        if item is not None:
-            param_code = item#.decode("utf=8")
+        param_code = q.buy(block=True, timeout=30)
+        if param_code is not None:
             q.put(value=param_code, queue="run")
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
 
             ##########PYATMOS##########
-            # TESTING
-            run_code = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
+            atmos_output = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
+            """
+            possible returned string:
+              'success'
+              'photochem_error'
+              'clima_error' 
+            """
+            #for now, just assume stable
+            stable = True
             ##########PYATMOS##########
 
             # remove item off processing/lease queue
-            q.complete(item)
-            if errored:
+            q.complete(param_code)
+            if atmos_output in ["photochem_error","clima_error"]: #errored:
                 q.put(value=param_code, queue="error")
             else:
                 if stable:
