@@ -74,6 +74,8 @@ NOTE: Complete with a K8 Job Object or not? [Preemptible Instances](https://clou
 
 ### Worker Node
 
+**SERVICE ACCOUNTS**: these are very important to make sure permissions are granted accross all nodes. For everything related worker related, please use the **ultron** service account.
+
 Set up a 'model' VM Instance that can be converted into an 'image' or 'snapshot' to be thrown into a 'vm instance group'
 
 Open a fresh VM Instance with **Debian** (assumed 9.5 stretch) and run the following...use sudo for EVERYTHING:
