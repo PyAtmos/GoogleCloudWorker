@@ -49,8 +49,13 @@ while not q.kill():
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
 
+            ###########################
+            # Get the previous solutions file pyatmos run! 
+            ###########################
+            # TODO!!!!!!!!!!!!!!!!!!
+
             ##########PYATMOS##########
-            atmos_output = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
+            atmos_output = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, max_clima_steps=400, output_directory='/home/willfaw/results')
             atmos.write_metadata(output_directory+'/run_metadata.json') 
             """
             possible returned string:
@@ -61,7 +66,6 @@ while not q.kill():
             #for now, just assume stable
             stable = True
             # TESTING
-            run_code = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, max_clima_steps=400, output_directory='/home/willfaw/results')
             ##########PYATMOS##########
 
             ###########################
