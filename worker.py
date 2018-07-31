@@ -13,6 +13,7 @@ import os
 import sys
 import time
 from datetime import datetime
+import tempfile
 
 import pyatmos 
 
@@ -54,6 +55,11 @@ while not q.kill():
             # Get the previous solutions file pyatmos run! 
             ###########################
             # TODO!!!!!!!!!!!!!!!!!!
+            previous_job_hash = '' 
+            tmp_file_name = tempfile.NamedTemporaryFile().name 
+            input_blob = gcs_bucket.blob
+            input_blob.download_to_file(tmp_file_name)
+
 
             ##########PYATMOS##########
             """
@@ -106,10 +112,10 @@ while not q.kill():
             file_list = os.listdir(local_output_directory)
 
             # upload files to google cloud bucket 
-            blob_output_dir = JOB_STORAGE_PATH + '/' + parah_hash 
+            blob_output_dir = JOB_STORAGE_PATH + '/' + param_hash 
             for file_name in file_list: 
-                blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
-                blob.upload_from_filename(file_name) 
+                output_blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
+                output_blob.upload_from_filename(file_name) 
 
 
             # remove item off processing/lease queue
