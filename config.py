@@ -53,3 +53,9 @@ CLOUDSQL_DATABASE = 'test' #'pyatmos'
 # Redis Server Info
 REDIS_SERVER_IP = '10.138.0.21'
 REDIS_SERVER_NAME = 'pyatmos' #not an official name, just a consistent reference-name throughout this program
+
+# gcloud storage bucket
+CLOUD_BUCKET_NAME = 'astrobio'
+CLOUD_STORAGE_PATH = 'gs://'+CLOUD_BUCKET_NAME  
+JOB_STORAGE_PATH = 'test/'
+

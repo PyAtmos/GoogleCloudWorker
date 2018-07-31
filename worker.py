@@ -21,12 +21,21 @@ import rediswq
 import utilities
 from config import *
 
+# Cloud storage
+from google.cloud import storage
+
+
 
 ####################
 ### Start PyAtmos
 atmos = pyatmos.Simulation(docker_image="gcr.io/i-agility-205814/pyatmos_docker")
 # above docker image uses the 'old' version of atmos
 atmos.start()
+
+####################
+# conect to GCS storage
+gcs_storage_client = storage.Client()
+gcs_bucket = gcs_storage_client.get_bucket(CLOUD_BUCKET_NAME) 
 
 ####################
 ### Start the Worker
@@ -42,6 +51,7 @@ while not q.kill():
 
             ##########PYATMOS##########
             atmos_output = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, n_clima_steps=400, output_directory='/home/willfaw/results')
+            atmos.write_metadata(output_directory+'/run_metadata.json') 
             """
             possible returned string:
               'success'
@@ -50,7 +60,23 @@ while not q.kill():
             """
             #for now, just assume stable
             stable = True
+            # TESTING
+            run_code = atmos.run(species_concentrations=param_dict, max_photochem_iterations=10000, max_clima_steps=400, output_directory='/home/willfaw/results')
             ##########PYATMOS##########
+
+            ###########################
+            # Store pyatmos results on google cloud 
+            ###########################
+
+            # get list of files in output directory
+            file_list = os.listdir(output_directory)
+
+            # upload files to google cloud bucket 
+            blob_output_dir = JOB_STORAGE_PATH + '/' + parah_hash 
+            for file_name in file_list: 
+                blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
+                blob.upload_from_filename(file_name) 
+
 
             # remove item off processing/lease queue
             q.complete(param_code)
