@@ -161,12 +161,17 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     point = session.query(ParameterSpace).filter_by(hash=hashed).first()
     point.state = run_status
     point.stable = stability
-    point.end_time = datetime.utcnow()
+    point.session_end_time = datetime.utcnow()
     # metadata
-    for key in ATMOS_METADATA:
-        point.__dict__[key] = metadata_dict[key]
-        print("in loop:", point.__dict__[key], metadata_dict[key])
-    print("out loop:", point.__dict__[key], metadata_dict[key])
+    # session.commit doesn't acknowledge changes like this: point.__dict__[key] = metadata_dict[key]
+    # so hard code the updates for each attribute
+    point.atmos_start_time = metadata_dict['atmos_start_time'
+    point.photochem_duration = metadata_dict['photochem_duration']
+    point.photochem_iterations = metadata_dict['photochem_iterations']
+    point.clima_duration = metadata_dict['clima_duration']
+    point.atmos_run_duraton = metadata_dict['atmos_run_duraton']
+    point.input_max_clima_iterations = metadata_dict['input_max_clima_iterations']
+    point.input_max_photochem_iterations = metadata_dict['input_max_photochem_iterations']
     session.commit()
     return "completed: %s - %s" % (point.hash, run_status)
 
