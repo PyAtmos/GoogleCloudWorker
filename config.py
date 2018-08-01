@@ -24,6 +24,7 @@ start = {
     }
 
 ATMOS_MOL = list(start.keys())
+print("atmos_mol...",ATMOS_MOL)
 
 # increment dictionary to defien the step sizes for the search
 increment_dict = {
