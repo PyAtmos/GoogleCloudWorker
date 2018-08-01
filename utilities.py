@@ -131,7 +131,6 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                 else:
                     # add to main queue and sql queue
                     #redis_db.put(value=neighbor, queue="main")
-                    print("adding neighbor: %s" % neighbor)
                     packed_list = pack_items( [param_encode(neighbor),param_encode(param_dict)] )
                     redis_db.put(value=packed_list, queue="main sql")
 
