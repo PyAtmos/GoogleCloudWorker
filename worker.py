@@ -84,6 +84,7 @@ while not q.kill():
             ### Get Atmos Metadata
             atmos.write_metadata(local_output_directory+'/run_metadata.json')
             run_metadata_dict = atmos.get_metadata()
+            print("atmos metadata:\n", run_metadata_dict)
             # see config.py for list of values from run_metadata_dict that we care about
             # or go to pyatmos code -> Simulation.get_metadata()
 
