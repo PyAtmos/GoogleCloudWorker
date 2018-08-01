@@ -134,7 +134,7 @@ class RedisWQ(object):
             item = self._db.rpoplpush(self._main_q_key, self._processing_q_key)
 
         if (item is not None) & (type(item)==bytes):
-            item = item.decode("utf=8")
+            item = str(item.decode("utf=8"))
         else:
             pass
         return item
@@ -225,7 +225,7 @@ class RedisWQ(object):
                 print("ERROR: not a proper queue name")
                 return 0
         if (item is not None) & (type(item)==bytes):
-            item = item.decode("utf=8")
+            item = str(item.decode("utf=8")) #python2 .decode(...) outputs unicde, python3 outputs str
         else:
             pass
         return item

@@ -221,10 +221,7 @@ if not args.master:
 
             atmos_output = unpacked_list[1]
             stable_atmosphere = unpacked_list[2]
-            print("as the full code\n", packed_code)
-            print("as a code:\n", unpacked_list[3])
             metadata_dict = utilities.metadata_decode(unpacked_list[3])
-            print("metadata dict:\n",metadata_dict)
             msg = complete_db(data=param_code,
                             dtype="code",
                             run_status=atmos_output,
