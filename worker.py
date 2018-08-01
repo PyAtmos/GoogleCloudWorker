@@ -68,7 +68,7 @@ while not q.kill():
                 # previous clima
                 tmp_clima_file = tempfile.NamedTemporaryFile().name
                 input_clima_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/TempOut.dat') # Temp for temperature here 
-                input_clima_blob.download_to_file(tmp_clima_file)
+                input_clima_blob.download_to_filename(tmp_clima_file)
 
             ### Run PYATMOS
             atmos_output = atmos.run(species_concentrations     = param_dict,
@@ -91,6 +91,10 @@ while not q.kill():
             run_metadata_dict = atmos.get_metadata()
             # see config.py for list of values from run_metadata_dict that we care about
             # or go to pyatmos code -> Simulation.get_metadata()
+
+            # add surface temp and pressure to metadata dict
+            run_metadata_dict['pressure'] = ...
+            run_metadata_dict['temperature'] = ...
 
             ### Store pyatmos results on google cloud (will grab all output files automatically) 
             file_list = os.listdir(local_output_directory)
