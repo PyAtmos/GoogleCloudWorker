@@ -93,8 +93,8 @@ while not q.kill():
             # or go to pyatmos code -> Simulation.get_metadata()
 
             # add surface temp and pressure to metadata dict
-            run_metadata_dict['pressure'] = ...
-            run_metadata_dict['temperature'] = ...
+            run_metadata_dict['pressure'] = atmos.get_surface_pressure(local_output_directory+'/parsed_clima_final.csv')
+            run_metadata_dict['temperature'] = atmos.get_surface_temperature(local_output_directory+'/parsed_clima_final.csv')
 
             ### Store pyatmos results on google cloud (will grab all output files automatically) 
             file_list = os.listdir(local_output_directory)
