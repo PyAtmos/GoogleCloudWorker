@@ -80,7 +80,11 @@ NOTE: Complete with a K8 Job Object or not? [Preemptible Instances](https://clou
 
 Set up a 'model' VM Instance that can be converted into an 'image' or 'snapshot' to be thrown into a 'vm instance group'
 
-Open a fresh VM Instance with **Debian** (assumed 9.5 stretch) and run the following...use sudo for EVERYTHING:
+[Docker Instructions for **Debian**](https://docs.docker.com/install/linux/docker-ce/debian/)
+
+[Docker Instructions for **Ubuntu**](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+
+Run the following (example given for Debian but follow above for Ubuntu)...use sudo for EVERYTHING:
 
     $ cd /home
 
