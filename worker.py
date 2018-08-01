@@ -44,16 +44,13 @@ while not q.kill():
         packed_code = q.buy(block=True, timeout=30)
         if packed_code is not None:
             param_code, prev_param_code = utilities.unpack_items(packed_code)
-            print("incoming param code", param_code, utilities.param_decode(param_code))
             q.put(value=param_code, queue="run")
 
             param_dict = utilities.param_decode(param_code)
-            print("and it's converted...", param_dict)
             param_hash = utilities.param_hash(param_dict)
 
             for key in param_dict.keys():
                 param_dict[key] = float(param_dict[key])
-            print("converted to float", param_dict)
 
             # Get the previous solutions file pyatmos run! 
             if prev_param_code == "first run":
@@ -67,7 +64,6 @@ while not q.kill():
                 input_blob.download_to_filename(tmp_file_name)
 
             ### Run PYATMOS
-            print("now feeding into atmos", param_dict)
             atmos_output = atmos.run(species_concentrations=param_dict,
                                     max_photochem_iterations=10000,
                                     max_clima_steps=400,
