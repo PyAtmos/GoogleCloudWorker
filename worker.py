@@ -55,20 +55,29 @@ while not q.kill():
             # Get the previous solutions file pyatmos run! 
             if prev_param_code == "first run":
                 prev_param_hash = None
-                tmp_file_name = None
+                tmp_photochem_file = None
+                tmp_clima_file = None 
             else:
+                # previous hashes
                 prev_param_dict = utilities.param_decode(prev_param_code)
                 prev_param_hash = utilities.param_hash(prev_param_dict)
-                tmp_file_name = tempfile.NamedTemporaryFile().name
-                input_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/out.dist')
-                input_blob.download_to_filename(tmp_file_name)
+                # previous photochem 
+                tmp_photochem_file = tempfile.NamedTemporaryFile().name
+                input_photochem_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/out.dist')
+                input_photochem_blob.download_to_filename(tmp_photochem_file)
+                # previous clima
+                tmp_clima_file = tempfile.NamedTemporaryFile().name
+                input_clima_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/TempOut.dat') # Temp for temperature here 
+                input_clima_blob.download_to_file(tmp_clima_file)
 
             ### Run PYATMOS
-            atmos_output = atmos.run(species_concentrations=param_dict,
-                                    max_photochem_iterations=10000,
-                                    max_clima_steps=400,
-                                    output_directory=local_output_directory,
-                                    input_file_path=tmp_file_name)
+            atmos_output = atmos.run(species_concentrations     = param_dict,
+                                    max_photochem_iterations    = 10000,
+                                    max_clima_steps             = 400,
+                                    output_directory            = local_output_directory,
+                                    previous_photochem_solution = tmp_photochem_file,
+                                    previous_clima_solution     = tmp_clima_file
+                                    )
             # atmos_output could be 'success', 'photochem_error', 'clima_error'
             stable_atmosphere = "" #for now, just assume stable if atmos_output is 'success'
             if atmos_output == "success":
@@ -83,7 +92,7 @@ while not q.kill():
             # see config.py for list of values from run_metadata_dict that we care about
             # or go to pyatmos code -> Simulation.get_metadata()
 
-            ### Store pyatmos results on google cloud 
+            ### Store pyatmos results on google cloud (will grab all output files automatically) 
             file_list = os.listdir(local_output_directory)
             blob_output_dir = JOB_STORAGE_PATH + '/' + param_hash 
             for file_name in file_list: 
