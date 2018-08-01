@@ -88,7 +88,7 @@ while not q.kill():
             blob_output_dir = JOB_STORAGE_PATH + '/' + param_hash 
             for file_name in file_list: 
                 output_blob = gcs_bucket.blob(blob_output_dir + '/' + file_name) 
-                output_blob.upload_from_filename(file_name) 
+                output_blob.upload_from_filename(local_output_directory + '/' + file_name) 
 
             # remove item off processing/lease queue
             metadata_code = utilities.metadata_encode(run_metadata_dict)
