@@ -158,7 +158,7 @@ And then run the master sql client
 
 Then launch the sql-listen node to have an easy way to query the table for updates
 
-    $ gcloud sql connect SERVERNAME --user=root
+    $ gcloud sql connect sql-server --user=root
     #enter password
     MySQL [(none)]> Use DBNAME;
     MySQL [db name]> Select * from TABLENAME;

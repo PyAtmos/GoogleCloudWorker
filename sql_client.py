@@ -255,7 +255,7 @@ if not args.master:
 else: #master True
     print("Created Master Read/Write SQL Client")
     while not q.kill():
-        if q.size("error")+q.size("complete0")+q.size("complete1")+q.size("main sql")+q.size("main") == 0:
+        if q.size("complete")+q.size("run")+q.size("main sql")+q.size("main") == 0:
             points = session.query(ParameterSpace).filter_by(state='running')
             for point in points:
                 timedelta = datetime.utcnow() - point.session_start_time
