@@ -83,6 +83,11 @@ def calc_filler(param_dict):
     return filler
 
 
+### TO DO ###
+# NEED TO CHANGE increment_dict; ASSUMPTION THAT ORDER IS MAINTAINED IN DICTIONARIES IS NOT STRONG
+# increment_dict = {bins : [.01, .05, .1, .5, 1], increments : [.001, .002, ...]}
+
+
 ####################
 ### Explore Functions
 def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="sides"):

@@ -62,9 +62,9 @@ while not q.kill():
             else:
                 prev_param_dict = utilities.param_decode(prev_param_code)
                 prev_param_hash = utilities.param_hash(prev_param_dict)
-                tmp_file_name = tempfile.NamedTemporaryFile().name 
+                tmp_file_name = tempfile.NamedTemporaryFile().name
                 input_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/out.dist')
-                input_blob.download_to_file(tmp_file_name)
+                input_blob.download_to_filename(tmp_file_name)
 
             ### Run PYATMOS
             print("now feeding into atmos", param_dict)

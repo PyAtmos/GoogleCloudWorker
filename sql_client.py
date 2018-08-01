@@ -165,8 +165,10 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     # metadata
     for key in ATMOS_METADATA:
         point.__dict__[key] = metadata_dict[key]
+        print("in loop:", point.__dict__[key], metadata_dict[key])
+    print("out loop:", point.__dict__[key], metadata_dict[key])
     session.commit()
-    return "completed: %s - %s" % (point.hash, msg)
+    return "completed: %s - %s" % (point.hash, run_status)
 
 
 def delete_db(data, dtype="dict"):
@@ -207,7 +209,6 @@ if not args.master:
 
         param_code = q.get("run", block=True, timeout=30)
         if param_code is not None:
-            print("prep:", param_code, utilities.param_decode(param_code))
             msg = run_db(data=param_code, dtype="code")
             print(msg)
         else:
@@ -218,16 +219,16 @@ if not args.master:
             unpacked_list = utilities.unpack_items(packed_code)
             param_code = unpacked_list[0]
 
-            print("prep:", param_code, utilities.param_decode(param_code))
             atmos_output = unpacked_list[1]
             stable_atmosphere = unpacked_list[2]
             metadata_dict = utilities.metadata_decode(unpacked_list[3])
-
+            print("metadata dict:\n",metadata_dict)
             msg = complete_db(data=param_code,
                             dtype="code",
                             run_status=atmos_output,
                             stability=stable_atmosphere,
                             metadata_dict=metadata_dict)
+            print(msg)
         else:
             pass
 
@@ -278,13 +279,13 @@ else: #master True
         param_code = q.get("main sql", block=True, timeout=30)
         if param_code is not None:
             next_param_code, prev_param_code = utilities.unpack_items(param_code)
-            print("incoming code:", next_param_code, utilities.param_decode(next_param_code))
             if not exists_db(next_param_code, dtype="code"): #check if item in DB already
                 msg = add_db(data=next_param_code, dtype="code")
                 q.put(param_code, "main")
                 print(msg)
             else:
                 # already in the DB
+                print("repeat: %s" % utilities.param_hash(utilities.param_decode(next_param_code)))
                 pass
         else:
             pass

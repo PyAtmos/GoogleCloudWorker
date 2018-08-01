@@ -24,7 +24,6 @@ start = {
     }
 
 ATMOS_MOL = ["O2","N2","H2O","CH4","CO2","H2"]#list(start.keys())
-print("atmos_mol...",ATMOS_MOL)
 
 # increment dictionary to defien the step sizes for the search
 increment_dict = {
