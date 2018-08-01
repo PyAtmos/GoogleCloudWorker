@@ -217,7 +217,7 @@ if not args.master:
         if packed_code is not None:
             unpacked_list = utilities.unpack_items(packed_code)
             param_code = unpacked_list[0]
-            
+
             print("prep:", param_code, utilities.param_decode(param_code))
             atmos_output = unpacked_list[1]
             stable_atmosphere = unpacked_list[2]
@@ -278,6 +278,7 @@ else: #master True
         param_code = q.get("main sql", block=True, timeout=30)
         if param_code is not None:
             next_param_code, prev_param_code = utilities.unpack_items(param_code)
+            print("incoming code:", next_param_code, utilities.param_decode(next_param_code))
             if not exists_db(next_param_code, dtype="code"): #check if item in DB already
                 msg = add_db(data=next_param_code, dtype="code")
                 q.put(param_code, "main")
