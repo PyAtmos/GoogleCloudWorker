@@ -76,6 +76,8 @@ class ParameterSpace(Base):
     atmos_run_duraton = Column(String(256))
     input_max_clima_iterations = Column(String(256))
     input_max_photochem_iterations = Column(String(256))
+    temperature = Column(String(256))
+    pressure = Column(String(256))
     #
     def __init__(self, parameter_dict):
         self.hash = utilities.param_hash(parameter_dict)
@@ -172,6 +174,8 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     point.atmos_run_duraton = metadata_dict['atmos_run_duraton']
     point.input_max_clima_iterations = metadata_dict['input_max_clima_iterations']
     point.input_max_photochem_iterations = metadata_dict['input_max_photochem_iterations']
+    point.temperature = metadata_dict['temperature']
+    point.pressure = metadata_dict['pressure']
     session.commit()
     return "completed: %s - %s" % (point.hash, run_status)
 

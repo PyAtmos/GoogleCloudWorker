@@ -46,7 +46,9 @@ ATMOS_METADATA = ['atmos_start_time',
                 'clima_duration',
                 'atmos_run_duraton',
                 'input_max_clima_iterations',
-                'input_max_photochem_iterations']
+                'input_max_photochem_iterations',
+                'temperature',
+                'pressure']
 
 
 MAX_JOB_RUN_TIME = 5*60*60 #in seconds
