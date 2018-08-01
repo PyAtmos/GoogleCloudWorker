@@ -23,6 +23,8 @@ start = {
     "H2" : 0.0000000813,
     }
 
+ATMOS_MOL = list(start.keys())
+
 # increment dictionary to defien the step sizes for the search
 increment_dict = {
     "O2" : {1.0 : 0.001},

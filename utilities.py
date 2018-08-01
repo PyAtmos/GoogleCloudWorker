@@ -16,7 +16,7 @@ from copy import deepcopy
 ### Parameter Conversions
 def param_encode(param_dict):
     param_str = ""
-    for molecule, _ in start.items():
+    for molecule in ATMOS_MOL:
         #string += molecule
         concentration = param_dict[molecule]
         param_str += str(concentration)
@@ -27,13 +27,13 @@ def param_encode(param_dict):
 def param_decode(param_str):
     param_list = param_str.split(",")
     param_dict = {}
-    for i, (molecule,_) in enumerate(start.items()):
+    for i, molecule in enumerate(ATMOS_MOL):
         param_dict[molecule] = param_list[i]
     return param_dict
 
 def param_hash(param_dict):
     string = ""
-    for molecule, _ in start.items():
+    for molecule in ATMOS_MOL:
         string += molecule
         concentration = param_dict[molecule]
         string += str(concentration)
