@@ -22,6 +22,8 @@ How to build the Pyatmos worker image:
 
 
 
+**MISC NOTES**: should document somewhere how if you run worker.py (or more specifically pyatmos) and end it, the next restart might error. you'll see something like iterations[-1] out of range; just exit and reopen the instance.
+
 
 ## Outline
 

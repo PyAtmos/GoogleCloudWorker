@@ -1,8 +1,8 @@
 setuptools
+pandas
 docker
 google-cloud-storage
 google.cloud
-numpy
 redis
 uuid
 datetime
