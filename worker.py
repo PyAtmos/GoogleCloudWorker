@@ -49,6 +49,9 @@ while not q.kill():
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
 
+            for key in param_dict.keys():
+                param_dict[key] = float(param_dict[key])
+
             # Get the previous solutions file pyatmos run! 
             if prev_param_code == "first run":
                 prev_param_hash = None
