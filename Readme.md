@@ -72,7 +72,14 @@ Cloud SQL database...Store the following:
 
 NOTE: Complete with a K8 Job Object or not? [Preemptible Instances](https://cloud.google.com/compuhttps://cloud.google.com/kubernetes-engine/docs/how-to/preemptible-vms)?
 
+### Create a new machine from which to create a disk image from 
 
+Go to the google cloud console, click on "create new instance"
+    * give it a name
+    * select us-wets-b
+    * select ubuntu
+    * select ultron service account
+    * follow instructions in "Worker Node" below  
 
 ### Worker Node
 
@@ -370,3 +377,8 @@ A few links that helped in exploring about Google Cloud Engine (GCE), Kubernetes
 4. Another [Redis example](https://kubernetes.io/docs/tutorials/stateless-application/guestbook/): especially good for seeing how to start a Redis Demployment + Service on GCE...and also here is the corresponding [GitHub Repo](https://github.com/kubernetes/examples/tree/master/guestbook)
 
 5. A bit on [Cloud SQL with Python](https://cloud.google.com/python/getting-started/using-cloud-sql): Be sure to be familiar with SQLAlchemy but don't bother with Flask...the corresponding [GitHub Repo](https://github.com/GoogleCloudPlatform/getting-started-python/tree/master/2-structured-data)
+
+
+
+
+
