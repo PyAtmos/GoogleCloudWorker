@@ -78,7 +78,7 @@ while not q.kill():
                                     previous_photochem_solution = tmp_photochem_file,
                                     previous_clima_solution     = tmp_clima_file
                                     )
-            # atmos_output could be 'success', 'photochem_error', 'clima_error'
+            # atmos_output could be 'success', 'photochem_error', 'clima_error', 'photochem_nonconverged' 
             stable_atmosphere = "" #for now, just assume stable if atmos_output is 'success'
             if atmos_output == "success":
                 stable_atmosphere = True
@@ -87,7 +87,7 @@ while not q.kill():
                 pass
 
             ### Get Atmos Metadata
-            atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash } )
+            atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash} )
             run_metadata_dict = atmos.get_metadata()
             # see config.py for list of values from run_metadata_dict that we care about
             # or go to pyatmos code -> Simulation.get_metadata()
