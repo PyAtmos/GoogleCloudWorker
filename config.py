@@ -27,18 +27,18 @@ ATMOS_MOL = ["O2","N2","H2O","CH4","CO2","H2"]#list(start.keys())
 
 # increment dictionary to defien the step sizes for the search
 increment_dict = {
-    "O2" : {'bins' : [1.0],
-            'increment' : [0.001]},
+    "O2" : {'bins' : [0.3 , 1.0],
+            'increment' : [0.02 , 0.05]},
     "N2" : {'bins' : [1.0],
             'increment' : [0.0]},
-    "H2O" : {'bins' : [1.0],
-            'increment' : [0.0001]},
-    "CH4" : {'bins' : [1.0],
-            'increment' : [0.00000001]},
-    "CO2" : {'bins' : [1.0],
-            'increment' : [0.00001]},
-    "H2" : {'bins' : [1.0],
-            'increment' : [0.0000000001]},
+    "H2O" : {'bins' : [0.9 , 1.0],
+            'increment' : [0.1 , 0.0]},
+    "CH4" : {'bins' : [0.1 , 1.0],
+            'increment' : [0.005 , 0.0]},
+    "CO2" : {'bins' : [0.1 , 1.0],
+            'increment' : [0.01 , 0.05]},
+    "H2" : {'bins' : [0.000000001 , 1.0],
+            'increment' : [0.0000000001 , 0.0]},
 }
 #future:
 # "O2" : {'bins' : [0.1, 0.5, 1.0],
