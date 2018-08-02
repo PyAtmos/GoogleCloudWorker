@@ -67,6 +67,7 @@ class ParameterSpace(Base):
     state = Column(String(256))
     session_start_time = Column(DateTime)
     session_end_time = Column(DateTime)
+    bucket_path = Column(String(256))
     # atmos metadata
     stable = Column(String(256))
     atmos_start_time = Column(String(256))
@@ -164,6 +165,7 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     point.state = run_status
     point.stable = stability
     point.session_end_time = datetime.utcnow()
+    point.bucket_path = JOB_STORAGE_PATH
     # metadata
     # session.commit doesn't acknowledge changes like this: point.__dict__[key] = metadata_dict[key]
     # so hard code the updates for each attribute

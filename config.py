@@ -27,15 +27,24 @@ ATMOS_MOL = ["O2","N2","H2O","CH4","CO2","H2"]#list(start.keys())
 
 # increment dictionary to defien the step sizes for the search
 increment_dict = {
-    "O2" : {1.0 : 0.001},
-    "N2" : {1.0 : 0.0},
-    "H2O" : {1.0 : 0.0001},
-    "CH4" : {1.0 : 0.00000001},
-    "CO2" : {1.0 : 0.00001},
-    "H2" : {1.0 : 0.0000000001},
-    }
+    "O2" : {'bins' : [1.0],
+            'increment' : [0.001]},
+    "N2" : {'bins' : [1.0],
+            'increment' : [0.0]},
+    "H2O" : {'bins' : [1.0],
+            'increment' : [0.0001]},
+    "CH4" : {'bins' : [1.0],
+            'increment' : [0.00000001]},
+    "CO2" : {'bins' : [1.0],
+            'increment' : [0.00001]},
+    "H2" : {'bins' : [1.0],
+            'increment' : [0.0000000001]},
+}
+#future:
+# "O2" : {'bins' : [0.1, 0.5, 1.0],
+#        'increment' : [0.001, 0.01, 0.1]}
 
-ALTER_MOLECULES = ["O2"]
+ALTER_MOLECULES = ["O2","H2O"]
 
 
 # 'keys' from run_metadata_dict (atmos metadata) that we want to keep and add to sql database
@@ -62,7 +71,7 @@ CLOUDSQL_SERVER_PASSWORD = 'AreWeAlone'
 CLOUDSQL_SERVER_ID = 'sql-server'
 CLOUDSQL_SERVER_IP = '35.233.245.129'
 CLOUDSQL_SERVER_REGION = "us-west1"
-CLOUDSQL_DATABASE = 'test' #'pyatmos'
+CLOUDSQL_DATABASE = 'test2' #'pyatmos'
 
 # Redis Server Info
 REDIS_SERVER_IP = '10.138.0.21'
@@ -71,5 +80,5 @@ REDIS_SERVER_NAME = 'pyatmos' #not an official name, just a consistent reference
 # gcloud storage bucket
 CLOUD_BUCKET_NAME = 'astrobio'
 CLOUD_STORAGE_PATH = 'gs://'+CLOUD_BUCKET_NAME  
-JOB_STORAGE_PATH = 'test'
+JOB_STORAGE_PATH = 'test2'
 

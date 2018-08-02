@@ -105,22 +105,19 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
     #check to see if any of the neighbors are added to queue or if they've all been executed (dead end)
     steps = np.concatenate((-1*(np.arange(step_size)+1),np.arange(step_size)+1))
     if search_mode == "sides":
-        for molecule, concentration in param_dict.items():
-            concentration = float(concentration)
-            if molecule in ALTER_MOLECULES: #["other","filler"]:
-                pass
-            else:
-                continue
-            # look up how much we can increment the molecule based off it's concentration
-            for max_conc, increment in increment_dict[molecule].items():
-                if concentration < max_conc:
+        for molecule in ALTER_MOLECULES:
+            concentration = float(param_dict[molecule])
+            mol_increment_dict = increment_dict[molecule]
+            for b, bin in enumerate(mol_increment_dict['bins']):
+                if concentration < bin:
                     break
                 else:
-                    pass
+                    continue
+            increment = mol_increment_dict['increment'][b]
             for direction in steps:
                 neighbor = deepcopy(param_dict)
                 val = round_partial(concentration + direction*increment, increment)
-                if val >= 0:
+                if val > 0:
                     neighbor[molecule] = val
                 else:
                     continue
@@ -139,24 +136,22 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
         # and if we have 'd' number of dimensions to explore...dimensions is number of molecules we're exploring
         # then we'll have (s^d - 1) neighbors to search for
         # idea, create
-        previous_list = [param_dict]
-        for molecule, concentration in param_dict:
-            concentration = float(concentration)
-            if molecule in ALTER_MOLECULES:
-                pass
-            else:
-                continue
+        next_list = [param_dict]
+        for molecule in ALTER_MOLECULES:
+            concentration = float(param_dict[molecule])
+            mol_increment_dict = increment_dict[molecule]
             previous_list = deepcopy(next_list)
             for direction in steps:
                 for neighbor in previous_list:
                     neigh = deepcopy(neighbor)
-                    for max_conc, increment in increment_dict[molecule].items():
-                        if concentration < max_conc:
+                    for b, bin in enumerate(mol_increment_dict['bins']):
+                        if concentration < bin:
                             break
                         else:
-                            pass
+                            continue
+                    increment = mol_increment_dict['increment'][b]
                     val = round_partial(concentration + direction*increment, increment)
-                    if val >= 0:
+                    if val > 0:
                         neigh[molecule] = val
                         next_list.append(neigh)
                     else:
