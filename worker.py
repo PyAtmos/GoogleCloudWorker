@@ -22,29 +22,34 @@ from config import *
 from google.cloud import storage
 
 
-
+open('my_file0.txt', 'a').close()
 ####################
 ### Start PyAtmos
 atmos = pyatmos.Simulation(docker_image="gcr.io/i-agility-205814/pyatmos_docker")
 # above docker image uses the 'old' version of atmos
 atmos.start()
-
+open('my_file1.txt', 'a').close()
 ####################
 # conect to GCS storage
 gcs_storage_client = storage.Client()
 gcs_bucket = gcs_storage_client.get_bucket(CLOUD_BUCKET_NAME)
 local_output_directory = '/home/willfaw/results'
-
+open('my_file2.txt', 'a').close()
 ####################
 ### Start the Worker
 q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
 while not q.kill():
+    open('my_file.txt3', 'a').close()
     if q.size("main") != 0:
+        open('my_file4.txt', 'a').close()
         # grab next set of param off queue
         packed_code = q.buy(block=True, timeout=30)
+        open('my_file5.txt', 'a').close()
         if packed_code is not None:
+            open('my_file.txt6', 'a').close()
             param_code, prev_param_code = utilities.unpack_items(packed_code)
             q.put(value=param_code, queue="run")
+            open('my_file.txt7', 'a').close()
 
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
