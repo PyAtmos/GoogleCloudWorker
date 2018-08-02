@@ -1,9 +1,3 @@
-from config import *
-import rediswq
+#The easiest way to simply create a file without truncating it in case it exists is:
 
-q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
-while not q.kill():
-    if q.size("main") != 0:
-        item = q.get("main")
-        if item is not None:
-            q.put(value=item, queue="run")
+open('my_file.txt', 'a').close()
