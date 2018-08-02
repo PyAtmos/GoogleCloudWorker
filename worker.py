@@ -25,7 +25,7 @@ from google.cloud import storage
 open('my_file0.txt', 'a').close()
 ####################
 ### Start PyAtmos
-atmos = pyatmos.Simulation(docker_image="gcr.io/i-agility-205814/pyatmos_docker")
+atmos = pyatmos.Simulation(docker_image="gcr.io/i-agility-205814/pyatmos:co2-photogenic")
 # above docker image uses the 'old' version of atmos
 atmos.start()
 open('my_file1.txt', 'a').close()
