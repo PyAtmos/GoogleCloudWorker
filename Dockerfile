@@ -9,7 +9,7 @@ RUN apt-get update \
   && ln -s /usr/bin/python3 python \
   && pip3 install --upgrade pip
 
-RUN mkdir -p /code/ 
+RUN mkdir -p /code/
 RUN mkdir -p /results/
 RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos.git
 RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/kuber-master.git
