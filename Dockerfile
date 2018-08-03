@@ -12,7 +12,6 @@ RUN apt-get update \
 
 # Make sure we're in the top directory
 RUN cd /
-
 # Create directory structure 
 RUN mkdir -p /code/
 RUN mkdir -p /results/
