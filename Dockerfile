@@ -1,24 +1,21 @@
-##########
-# slim dockerfile from
-# https://hub.docker.com/r/fnndsc/ubuntu-python3/~/dockerfile/
-FROM ubuntu:latest
+#FROM gcr.io/i-agility-205814/pyatmos
+FROM gcr.io/i-agility-205814/pyatmos:20d31da190a2bbb66359da2a7bde591a2ee5e847
+MAINTAINER Will Fawcett <willfaw@gmail.com>
+
 RUN apt-get update \
+  && apt-get install -y git \
   && apt-get install -y python3-pip python3-dev \
   && cd /usr/local/bin \
   && ln -s /usr/bin/python3 python \
   && pip3 install --upgrade pip
-ENTRYPOINT ["python3"]
+
+RUN mkdir /code/ && mkdir /results/
+RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos.git
+RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/kuber-master.git
+
+RUN cd /code/kuber-master  && pip3 install -r requirements.txt
+RUN cd /code/pyatmos && pip3 install . 
+
 ##########
-COPY ./requirements.txt /home
-COPY ./pyatmos /home/pyatmos
-COPY ./worker.py /home
-COPY ./rediswq.py /home
-COPY ./utilities.py /home
-COPY ./config.py /home
-WORKDIR /home
-RUN pip install -r requirements.txt
-RUN pip install pyatmos/.
-#CMD python worker.py
-CMD ls -l /var/run/docker.sock > "/home/fun.txt"
-CMD id -nG
-CMD docker run hello-world
+
+CMD sleep 35000d
