@@ -3,11 +3,15 @@ FROM gcr.io/i-agility-205814/pyatmos
 MAINTAINER Will Fawcett <willfaw@gmail.com>
 
 RUN apt-get update \
+  && apt-get install -y vim \
   && apt-get install -y git \
   && apt-get install -y python3-pip python3-dev \
   && cd /usr/local/bin \
   && ln -s /usr/bin/python3 python \
   && pip3 install --upgrade pip
+
+# Make sure we're in the top directory
+RUN cd /
 
 # Create directory structure 
 RUN mkdir -p /code/
