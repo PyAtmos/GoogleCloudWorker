@@ -1,5 +1,5 @@
-FROM gcr.io/i-agility-205814/pyatmos
-#FROM gcr.io/i-agility-205814/pyatmos:20d31da190a2bbb66359da2a7bde591a2ee5e847
+FROM gcr.io/i-agility-205814/pyatmos:c269dc45e448cd6f52d8bc1a2f05b04220b3346f
+#FROM gcr.io/i-agility-205814/pyatmos
 MAINTAINER Will Fawcett <willfaw@gmail.com>
 
 RUN apt-get update \
