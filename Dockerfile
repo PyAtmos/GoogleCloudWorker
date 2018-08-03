@@ -30,7 +30,7 @@ RUN cd /code/pyatmos && pip3 install .
 RUN export PYATMOSDIR=/code/pyatmos
 
 # Run the worker
-CMD cd /code/kuber-master/ && ./run.sh 
+CMD /code/kuber-master/run.sh 
 
 # make sure the docker image persists 
-CMD sleep 35000d
+#CMD sleep 35000d

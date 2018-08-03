@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-python3 worker.py
+python3 /code/kuber-master/worker.py
