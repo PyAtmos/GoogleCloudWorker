@@ -132,7 +132,17 @@ def run_db(data, dtype="dict"):
         hashed = utilities.param_hash(dicted)
     else:
         return "didn't recognize 'dtype'"
-    point = session.query(ParameterSpace).filter_by(hash=hashed).first()
+    forgive = 0
+    while forgive < 2: #add forgiveness buffer to make sure it has the time to get added to sql db
+        point = session.query(ParameterSpace).filter_by(hash=hashed).first()
+        if point is None:
+            forgive += 1
+        else:
+            break
+    if point is None:
+        return "something is wrong; couldn't find %s in database table" % (hashed)
+    else:
+        pass
     point.state = "running"
     session.commit()
     return "running: %s" % point.hash
