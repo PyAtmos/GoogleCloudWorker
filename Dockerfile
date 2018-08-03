@@ -1,5 +1,5 @@
-FROM gcr.io/i-agility-205814/pyatmos:c269dc45e448cd6f52d8bc1a2f05b04220b3346f
-#FROM gcr.io/i-agility-205814/pyatmos
+#FROM gcr.io/i-agility-205814/pyatmos:c269dc45e448cd6f52d8bc1a2f05b04220b3346f
+FROM gcr.io/i-agility-205814/pyatmos
 MAINTAINER Will Fawcett <willfaw@gmail.com>
 
 RUN apt-get update \
@@ -11,7 +11,7 @@ RUN apt-get update \
   && pip3 install --upgrade pip
 
 # Make sure we're in the top directory
-RUN cd /
+RUN pwd && cd / && pwd
 # Create directory structure 
 RUN mkdir -p /code/
 RUN mkdir -p /results/
@@ -29,7 +29,8 @@ RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiolog
 RUN cd /code/pyatmos && pip3 install . 
 RUN export PYATMOSDIR=/code/pyatmos
 
+# Run the worker
+CMD cd /code/kuber-master/ && ./run.sh 
 
-##########
-
+# make sure the docker image persists 
 CMD sleep 35000d
