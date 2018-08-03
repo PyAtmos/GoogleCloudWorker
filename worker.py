@@ -25,7 +25,6 @@ from google.cloud import storage
 ####################
 ### Start PyAtmos
 atmos = pyatmos.Simulation(code_path="/code/atmos") ### CHANGE THIS ###
-# above docker image uses the 'old' version of atmos
 atmos.start()
 ####################
 # conect to GCS storage
