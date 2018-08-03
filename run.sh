@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-exit
 export WORKERDIR=/code/kuber-master
 export PYATMOSDIR=/code/pyatmos
-python3 /code/kuber-master/worker.py
+echo "starting worker ..."
+echo $PWD
+/usr/bin/python3 /code/kuber-master/worker.py
+echo "completed worker"
+sleep 35000d 
