@@ -80,12 +80,7 @@ def calc_filler(param_dict):
             filler -= concentration
         else:
             continue
-    return filler
-
-
-### TO DO ###
-# NEED TO CHANGE increment_dict; ASSUMPTION THAT ORDER IS MAINTAINED IN DICTIONARIES IS NOT STRONG
-# increment_dict = {bins : [.01, .05, .1, .5, 1], increments : [.001, .002, ...]}
+    return round(filler, 10) #10 digits because that's the smallest digit it should go to
 
 
 ####################

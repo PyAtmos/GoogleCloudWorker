@@ -24,11 +24,15 @@ from sqlalchemy.sql import exists#, filter_by
 ####################
 ### Input arguments
 parser = argparse.ArgumentParser(description='Grab Master flag')
-parser.add_argument('-m', '--master', type=int, default=False,
-                    help='if nonzero, assigns node to do the "masters" work')
-parser.add_argument('-r', '--reset', type=int, default=False,
+parser.add_argument('-m', '--main', type=int, default=False,
+                    help='if nonzero, it strictly deals with adding items from main-sql to main queue')
+parser.add_argument('-r', '--run', type=int, default=False,
+                    help='if nonzero, it strictly deals with grabbing items from run queue')
+parser.add_argument('-c', '--complete', type=int, default=False,
+                    help='if nonzero, it strictly deals with grabbing items from complete queue')
+parser.add_argument('-R', '--reset', type=int, default=False,
                     help='if nonzero, delete existing tables and create new')
-parser.add_argument('-c', '--create', type=int, default=False,
+parser.add_argument('-C', '--create', type=int, default=False,
                     help='if nonzero, assume no tables exist and create new')
 args = parser.parse_args()
 
@@ -120,8 +124,19 @@ def add_db(data, dtype="dict"):
     else:
         return "didn't recognize 'dtype'"
     point = ParameterSpace(dicted)
+    hashed = point.hash
     session.add(point)
     session.commit()
+
+    # check that the point now exists
+    forgive = 0
+    while forgive < 2:
+        ret = session.query(exists().where(ParameterSpace.hash==hashed)).scalar()
+        if not ret:
+            forgive += 1
+            time.sleep(5)
+        else:
+            break
     return "added: %s" % point.hash
 
 def run_db(data, dtype="dict"):
@@ -137,6 +152,7 @@ def run_db(data, dtype="dict"):
         point = session.query(ParameterSpace).filter_by(hash=hashed).first()
         if point is None:
             forgive += 1
+            time.sleep(5)
         else:
             break
     if point is None:
@@ -222,10 +238,15 @@ def exists_db(data, dtype="dict"):
 ### Pull items from Redis Queue for Read + Write
 
 q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
-# ^consider making ^decode_responses=True^ so
-# that we don't have to convert binary to unicode for getting items off list
-if not args.master:
-    print("Created Normal Write SQL Client")
+
+# default to main if nothing else:
+if (not args.run) and (not args.complete):
+    args.main = True
+else:
+    pass
+
+if args.run:
+    print("Created Write SQL Client for 'Run Queue'")
     while not q.kill():
 
         param_code = q.get("run", block=True, timeout=30)
@@ -234,6 +255,10 @@ if not args.master:
             print(msg)
         else:
             pass
+
+elif args.complete:
+    print("Created Write SQL Client for 'Complete Queue'")
+    while not q.kill():
 
         packed_code = q.get("complete", block=True, timeout=30)
         if packed_code is not None:
@@ -252,34 +277,14 @@ if not args.master:
         else:
             pass
 
-
-        """
-        param_code = q.get("error", block=True, timeout=15)
-        if param_code is not None:
-            msg = error_db(msg="std error", data=param_code, dtype="code")
-            print(msg)
-        else:
-            pass
-
-        param_code = q.get("complete0", block=True, timeout=15)
-        if param_code is not None:
-            msg = complete_db(msg="unstable", data=param_code, dtype="code")
-            print(msg)
-        else:
-            pass
-
-        param_code = q.get("complete1", block=True, timeout=15)
-        if param_code is not None:
-            msg = complete_db(msg="stable", data=param_code, dtype="code")
-            print(msg)
-        else:
-            pass"""
-
-
-else: #master True
-    print("Created Master Read/Write SQL Client")
+elif args.main: #master True
+    print("Created Read/Write SQL Client for 'Main Queue'")
+    
+    checkpoint_time = time.time()
     while not q.kill():
-        if q.size("complete")+q.size("run")+q.size("main sql")+q.size("main") == 0:
+        #if q.size("complete")+q.size("run")+q.size("main sql")+q.size("main") == 0:
+        # instead, check every .25hour
+        if time.time() >= checkpoint_time + .25*60*60:
             points = session.query(ParameterSpace).filter_by(state='running')
             for point in points:
                 timedelta = datetime.utcnow() - point.session_start_time
@@ -293,6 +298,7 @@ else: #master True
                     q.put(point.code, "main")
                 else:
                     pass
+            checkpoint_time = time.time()
         else:
             pass
 
@@ -309,5 +315,8 @@ else: #master True
                 pass
         else:
             pass
+
+else:
+    pass
 
 

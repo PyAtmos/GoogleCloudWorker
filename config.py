@@ -44,7 +44,7 @@ increment_dict = {
 # "O2" : {'bins' : [0.1, 0.5, 1.0],
 #        'increment' : [0.001, 0.01, 0.1]}
 
-ALTER_MOLECULES = ["O2","H2O"]
+ALTER_MOLECULES = ["O2","H2O","CH4","CO2","H2"]
 
 
 # 'keys' from run_metadata_dict (atmos metadata) that we want to keep and add to sql database
@@ -71,7 +71,7 @@ CLOUDSQL_SERVER_PASSWORD = 'AreWeAlone'
 CLOUDSQL_SERVER_ID = 'sql-server'
 CLOUDSQL_SERVER_IP = '35.233.245.129'
 CLOUDSQL_SERVER_REGION = "us-west1"
-CLOUDSQL_DATABASE = 'o2_h2o' #'pyatmos'
+CLOUDSQL_DATABASE = 'all' #'pyatmos'
 
 # Redis Server Info
 REDIS_SERVER_IP = '10.138.0.21'
@@ -80,5 +80,5 @@ REDIS_SERVER_NAME = 'pyatmos' #not an official name, just a consistent reference
 # gcloud storage bucket
 CLOUD_BUCKET_NAME = 'astrobio'
 CLOUD_STORAGE_PATH = 'gs://'+CLOUD_BUCKET_NAME  
-JOB_STORAGE_PATH = 'o2_h2o'
+JOB_STORAGE_PATH = 'results'
 
