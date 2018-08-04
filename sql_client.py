@@ -130,13 +130,17 @@ def add_db(data, dtype="dict"):
 
     # check that the point now exists
     forgive = 0
-    while forgive < 2:
+    while forgive < 5:
         ret = session.query(exists().where(ParameterSpace.hash==hashed)).scalar()
         if not ret:
             forgive += 1
             time.sleep(5)
         else:
             break
+    if not ret:
+        return "tried to add; couldn't find [%s] in database table" % (hashed)
+    else:
+        pass
     return "added: %s" % point.hash
 
 def run_db(data, dtype="dict"):
@@ -148,7 +152,7 @@ def run_db(data, dtype="dict"):
     else:
         return "didn't recognize 'dtype'"
     forgive = 0
-    while forgive < 2: #add forgiveness buffer to make sure it has the time to get added to sql db
+    while forgive < 5: #add forgiveness buffer to make sure it has the time to get added to sql db
         point = session.query(ParameterSpace).filter_by(hash=hashed).first()
         if point is None:
             forgive += 1
@@ -156,7 +160,7 @@ def run_db(data, dtype="dict"):
         else:
             break
     if point is None:
-        return "something is wrong; couldn't find %s in database table" % (hashed)
+        return "tried to run; couldn't find [%s] in database table" % (hashed)
     else:
         pass
     point.state = "running"
@@ -187,7 +191,18 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
         hashed = utilities.param_hash(dicted)
     else:
         return "didn't recognize 'dtype'"
-    point = session.query(ParameterSpace).filter_by(hash=hashed).first()
+    forgive = 0
+    while forgive < 5: #add forgiveness buffer to make sure it has the time to get added to sql db
+        point = session.query(ParameterSpace).filter_by(hash=hashed).first()
+        if point is None:
+            forgive += 1
+            time.sleep(5)
+        else:
+            break
+    if point is None:
+        return "tried to complete; couldn't find [%s] in database table" % (hashed)
+    else:
+        pass
     point.state = run_status
     point.stable = stability
     point.session_end_time = datetime.utcnow()
@@ -274,6 +289,12 @@ elif args.complete:
                             stability=stable_atmosphere,
                             metadata_dict=metadata_dict)
             print(msg)
+            if msg[:5] == "tried":
+                # failed to add, add back to queue
+                q.put(value=packed_code, queue="complete")
+            else:
+                pass
+
         else:
             pass
 
@@ -307,6 +328,7 @@ elif args.main: #master True
             next_param_code, prev_param_code = utilities.unpack_items(param_code)
             if not exists_db(next_param_code, dtype="code"): #check if item in DB already
                 msg = add_db(data=next_param_code, dtype="code")
+                time.sleep(5)
                 q.put(param_code, "main")
                 print(msg)
             else:
