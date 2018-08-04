@@ -17,7 +17,7 @@ RUN mkdir -p /code/
 RUN mkdir -p /results/
 
 # Trick to make sure the latest version of the git repos are always checked out
-RUN /bin/true/1
+#RUN /bin/true
 
 # Checkout kuber-master and install packages
 RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/kuber-master.git
