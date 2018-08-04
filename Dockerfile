@@ -22,15 +22,13 @@ RUN /bin/true
 # Checkout kuber-master and install packages
 RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/kuber-master.git
 RUN cd /code/kuber-master  && pip3 install -r requirements.txt
-RUN export WORKERDIR=/code/kuber-master
 
 # Checkout pyatmos and install
 RUN cd /code/ && git clone https://gitlab.com/frontierdevelopmentlab/astrobiology/pyatmos.git
 RUN cd /code/pyatmos && pip3 install . 
-RUN export PYATMOSDIR=/code/pyatmos
 
 # Run the worker
-CMD cd /code/kuber-master/ && ./run.sh 
+CMD /code/kuber-master/run.sh 
 
 # make sure the docker image persists 
-CMD sleep 35000d
+#CMD sleep 35000d

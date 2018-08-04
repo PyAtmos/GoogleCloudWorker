@@ -72,7 +72,8 @@ while not q.kill():
                                     max_clima_steps             = 400,
                                     output_directory            = local_output_directory,
                                     previous_photochem_solution = tmp_photochem_file,
-                                    previous_clima_solution     = tmp_clima_file
+                                    previous_clima_solution     = tmp_clima_file,
+                                    save_logfiles               = True
                                     )
             # atmos_output could be 'success', 'photochem_error', 'clima_error', 'photochem_nonconverged' 
             stable_atmosphere = "" #for now, just assume stable if atmos_output is 'success'
