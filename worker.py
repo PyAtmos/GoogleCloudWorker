@@ -38,7 +38,7 @@ atmos.start()
 # conect to GCS storage
 gcs_storage_client = storage.Client()
 gcs_bucket = gcs_storage_client.get_bucket(CLOUD_BUCKET_NAME)
-local_output_directory = '/results'
+initial_local_output_directory = '/results'
 ####################
 ### Start the Worker
 q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
@@ -77,6 +77,7 @@ while not q.kill():
 
             ### Run PYATMOS
             ITERATION_NUMBER +=1 
+            local_output_directory = initial_local_output_directory + '/{0}'.format(ITERATION_NUMBER) 
             atmos_output = atmos.run(species_concentrations     = param_dict,
                                     max_photochem_iterations    = 10000,
                                     max_clima_steps             = 400,
