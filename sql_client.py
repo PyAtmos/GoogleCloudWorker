@@ -78,7 +78,7 @@ class ParameterSpace(Base):
     photochem_duration = Column(String(256))
     photochem_iterations = Column(String(256))
     clima_duration = Column(String(256))
-    atmos_run_duraton = Column(String(256))
+    atmos_run_duration = Column(String(256))
     input_max_clima_iterations = Column(String(256))
     input_max_photochem_iterations = Column(String(256))
     temperature = Column(String(256))
@@ -214,7 +214,7 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     point.photochem_duration = metadata_dict['photochem_duration']
     point.photochem_iterations = metadata_dict['photochem_iterations']
     point.clima_duration = metadata_dict['clima_duration']
-    point.atmos_run_duraton = metadata_dict['atmos_run_duraton']
+    point.atmos_run_duration = metadata_dict['atmos_run_duration']
     point.input_max_clima_iterations = metadata_dict['input_max_clima_iterations']
     point.input_max_photochem_iterations = metadata_dict['input_max_photochem_iterations']
     point.temperature = metadata_dict['temperature']
