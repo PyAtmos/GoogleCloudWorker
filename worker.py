@@ -42,6 +42,7 @@ local_output_directory = '/results'
 ####################
 ### Start the Worker
 q = rediswq.RedisWQ(name=REDIS_SERVER_NAME, host=REDIS_SERVER_IP)
+ITERATION_NUMBER = 0
 while not q.kill():
     if q.size("main") != 0:
         # grab next set of param off queue
@@ -75,12 +76,14 @@ while not q.kill():
                 input_clima_blob.download_to_filename(tmp_clima_file)
 
             ### Run PYATMOS
+            ITERATION_NUMBER +=1 
             atmos_output = atmos.run(species_concentrations     = param_dict,
                                     max_photochem_iterations    = 10000,
                                     max_clima_steps             = 400,
                                     output_directory            = local_output_directory,
                                     previous_photochem_solution = tmp_photochem_file,
                                     previous_clima_solution     = tmp_clima_file,
+                                    run_iteration_call          = ITERATION_NUMBER,
                                     save_logfiles               = True
                                     )
             # atmos_output could be 'success', 'photochem_error', 'clima_error', 'photochem_nonconverged' 
