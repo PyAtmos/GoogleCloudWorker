@@ -10,6 +10,7 @@ import sys
 import time
 from datetime import datetime
 import tempfile
+import git as gitpython 
 
 import pyatmos 
 
@@ -21,6 +22,13 @@ from config import *
 # Cloud storage
 from google.cloud import storage
 
+###################
+### Get git revision sha
+try:
+    repo = gitpython.Repo(search_parent_directories=True)
+    git_revision_sha = repo.head.object.hexsha
+except:
+    git_revision_sha = 'not_in_repo'
 
 ####################
 ### Start PyAtmos
@@ -84,7 +92,7 @@ while not q.kill():
                 pass
 
             ### Get Atmos Metadata
-            atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash} )
+            atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash, 'current_hash' : param_hash, 'git_revision_sha' : git_revision_sha} )
             run_metadata_dict = atmos.get_metadata()
             # see config.py for list of values from run_metadata_dict that we care about
             # or go to pyatmos code -> Simulation.get_metadata()
