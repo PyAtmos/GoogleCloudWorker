@@ -109,6 +109,10 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                 else:
                     continue
             increment = mol_increment_dict['increment'][b]
+            if increment == 0:
+                continue #skip this molecule
+            else:
+                pass
             for direction in steps:
                 neighbor = deepcopy(param_dict)
                 val = round_partial(concentration + direction*increment, increment)
@@ -145,6 +149,10 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                         else:
                             continue
                     increment = mol_increment_dict['increment'][b]
+                    if increment == 0:
+                        continue #skip this molecule
+                    else:
+                        pass
                     val = round_partial(concentration + direction*increment, increment)
                     if val > 0:
                         neigh[molecule] = val
