@@ -8,3 +8,4 @@ uuid
 datetime
 sqlalchemy
 pymysql
+gitpython
