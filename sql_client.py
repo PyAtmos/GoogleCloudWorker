@@ -61,6 +61,7 @@ class ParameterSpace(Base):
     __tablename__ = 'parameterspace'
     id = Column(Integer, primary_key=True)
     hash = Column(String(256))
+    previous_hash = Column(String(256))
     code = String(256)
     O2 = Column(Float)
     N2 = Column(Float)
@@ -79,6 +80,7 @@ class ParameterSpace(Base):
     photochem_iterations = Column(String(256))
     clima_duration = Column(String(256))
     atmos_run_duration = Column(String(256))
+    run_iteration_call = Column(String(256))
     input_max_clima_iterations = Column(String(256))
     input_max_photochem_iterations = Column(String(256))
     temperature = Column(String(256))
@@ -210,6 +212,8 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     # metadata
     # session.commit doesn't acknowledge changes like this: point.__dict__[key] = metadata_dict[key]
     # so hard code the updates for each attribute
+    point.previous_hash = metadata_dict['previous_hash']
+    point.run_iteration_call = metadata_dict['run_iteration_call']
     point.atmos_start_time = metadata_dict['atmos_start_time']
     point.photochem_duration = metadata_dict['photochem_duration']
     point.photochem_iterations = metadata_dict['photochem_iterations']
@@ -306,7 +310,7 @@ elif args.main: #master True
         #if q.size("complete")+q.size("run")+q.size("main sql")+q.size("main") == 0:
         # instead, check every .25hour
         if time.time() >= checkpoint_time + .25*60*60:
-            points = session.query(ParameterSpace).filter_by(state='running')
+            points = session.query(ParameterSpace).filter_by(state='queue')
             for point in points:
                 timedelta = datetime.utcnow() - point.session_start_time
                 timedelta = timedelta.days * 24 * 3600 + timedelta.seconds
@@ -316,7 +320,8 @@ elif args.main: #master True
                     point.state = "queue"
                     point.session_start_time = datetime.utcnow()
                     session.commit()
-                    q.put(point.code, "main")
+                    packed_items = utilities.pack_items( [point.code, point.previous_hash] )
+                    q.put(packed_items, "main")
                 else:
                     pass
             checkpoint_time = time.time()
@@ -328,7 +333,6 @@ elif args.main: #master True
             next_param_code, prev_param_code = utilities.unpack_items(param_code)
             if not exists_db(next_param_code, dtype="code"): #check if item in DB already
                 msg = add_db(data=next_param_code, dtype="code")
-                time.sleep(5)
                 q.put(param_code, "main")
                 print(msg)
             else:

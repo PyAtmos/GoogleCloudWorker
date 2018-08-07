@@ -57,7 +57,9 @@ ATMOS_METADATA = ['atmos_start_time',
                 'input_max_clima_iterations',
                 'input_max_photochem_iterations',
                 'temperature',
-                'pressure']
+                'pressure',
+                'run_iteration_call',
+                'previous_hash']
 
 
 MAX_JOB_RUN_TIME = 5*60*60 #in seconds
@@ -80,5 +82,5 @@ REDIS_SERVER_NAME = 'pyatmos' #not an official name, just a consistent reference
 # gcloud storage bucket
 CLOUD_BUCKET_NAME = 'astrobio'
 CLOUD_STORAGE_PATH = 'gs://'+CLOUD_BUCKET_NAME  
-JOB_STORAGE_PATH = 'fullrun_results'
+JOB_STORAGE_PATH = 'monday_run'
 
