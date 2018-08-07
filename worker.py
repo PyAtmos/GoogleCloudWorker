@@ -80,7 +80,7 @@ while not q.kill():
             local_output_directory = initial_local_output_directory + '/{0}'.format(ITERATION_NUMBER) 
             atmos_output = atmos.run(species_concentrations     = param_dict,
                                     max_photochem_iterations    = 10000,
-                                    max_clima_steps             = 400,
+                                    max_clima_steps             = 1000,
                                     output_directory            = local_output_directory,
                                     previous_photochem_solution = tmp_photochem_file,
                                     previous_clima_solution     = tmp_clima_file,
