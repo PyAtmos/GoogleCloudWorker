@@ -116,12 +116,12 @@ while not q.kill():
             gas_fluxes = atmos.get_surface_fluxes(local_output_directory+'/parsed_photochem_fluxes.csv', GASES_OF_INTEREST)
             
             # merge dictionaries 
-            run_metadata = { **run_metadata, **gas_fluxes }
+            run_metadata_dict = { **run_metadata_dict, **gas_fluxes }
 
             # Save the metadata dictionary
             #atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash, 'current_hash' : param_hash, 'git_revision_sha' : git_revision_sha} )
             with open(local_output_directory+'/run_metadata.json', 'w') as fp:
-                json.dump(run_metadata, fp, sort_keys=True, indent=4)
+                json.dump(run_metadata_dict, fp, sort_keys=True, indent=4)
 
 
             ### Store pyatmos results on google cloud (will grab all output files automatically) 
