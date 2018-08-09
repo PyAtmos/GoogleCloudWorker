@@ -43,7 +43,7 @@ increment_dict = {
 }'''
 increment_dict = {
     "O2" : {'bins' : [1.0],
-            'increment' : [0.01},
+            'increment' : [0.01]},
     "N2" : {'bins' : [1.0],
             'increment' : [0.0]},
     "H2O" : {'bins' : [1.0],
