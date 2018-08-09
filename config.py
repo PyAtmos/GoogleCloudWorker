@@ -62,7 +62,7 @@ ATMOS_METADATA = ['atmos_start_time',
                 'previous_hash']
 
 
-MAX_JOB_RUN_TIME = 5*60*60 #in seconds
+MAX_JOB_RUN_TIME = 8*60*60 #in seconds
 
 # GCE Info
 PROJECT_ID = 'i-agility-205814'
