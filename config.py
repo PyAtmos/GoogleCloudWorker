@@ -62,6 +62,8 @@ increment_dict = {
 
 ALTER_MOLECULES = ["O2","H2O","CH4","CO2","H2"]
 
+GASES_OF_INTEREST = ['H2O', 'CO2', 'CH4', 'CO', 'H2O', 'NH3', 'O3']
+
 
 # 'keys' from run_metadata_dict (atmos metadata) that we want to keep and add to sql database
 # see notes in worker.py or pyatmos.Simulation.get_metadata()
