@@ -85,7 +85,7 @@ def calc_filler(param_dict):
 
 ####################
 ### Explore Functions
-def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="sides", explore_count=0):
+def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="sides", explore_count="0"):
     # let's say param_dict is not a list of values but a dictionary:
     #param_dict = {
     #            "O2" : .05,

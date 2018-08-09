@@ -323,7 +323,7 @@ elif args.main: #master True
             next_param_code, prev_param_hash, explore_count = utilities.unpack_items(packed_items)
             if not exists_db(next_param_code, dtype="code"): #check if item in DB already
                 explore_count = 0
-                packed_items = utilities.pack_items( [next_param_code, prev_param_hash, explore_count] )
+                packed_items = utilities.pack_items( [next_param_code, prev_param_hash, str(explore_count)] )
                 msg = add_db(data=next_param_code, dtype="code")
                 q.put(packed_items, "main")
                 print(msg)
@@ -335,10 +335,10 @@ elif args.main: #master True
                 if point.temperature is None: # didn't complete, ignore
                     print("repeat: %s" % hashed)
                     pass
-                elif explore_count < EXPLORE_LIMIT: #did complete, and didn't already pass limit
-                    explore_count += 1
+                elif int(explore_count) < EXPLORE_LIMIT: #did complete, and didn't already pass limit
+                    explore_count = 1 + int(explore_count)
                     # add point to queue only so it explores
-                    packed_items = utilities.pack_items( [next_param_code, "explore only", explore_count] )
+                    packed_items = utilities.pack_items( [next_param_code, "explore only", str(explore_count)] )
                     q.put(packed_items, "main")
                     print("re-explore: %s" % hashed)
                 else: #did complete, but passed limit
