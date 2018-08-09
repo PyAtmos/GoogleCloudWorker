@@ -104,10 +104,11 @@ while not q.kill():
             run_metadata_dict['pressure'] = atmos.get_surface_pressure(local_output_directory+'/parsed_clima_final.csv')
             run_metadata_dict['temperature'] = atmos.get_surface_temperature(local_output_directory+'/parsed_clima_final.csv')
             run_metadata_dict['previous_hash'] = prev_param_hash
+            run_metadata_dict['current_hash'] = param_hash
 
             # add surface fluxes for gases we are interested in 
             gases_of_interest = ['H2O', 'CO2', 'CH4', 'CO', 'N2', 'H2O', 'NH3', 'O3']
-            gas_fluxes = atmos.get_surface_fluxes(local_output_directory+'/parsed_photochem_fluxes.csv')
+            gas_fluxes = atmos.get_surface_fluxes(local_output_directory+'/parsed_photochem_fluxes.csv', gases_of_interest)
             
             # merge dictionaries 
             run_metadata = { **run_metadata, **gas_fluxes }
