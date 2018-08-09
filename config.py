@@ -26,6 +26,7 @@ start = {
 ATMOS_MOL = ["O2","N2","H2O","CH4","CO2","H2"]#list(start.keys())
 
 # increment dictionary to defien the step sizes for the search
+'''
 increment_dict = {
     "O2" : {'bins' : [0.3 , 1.0],
             'increment' : [0.02 , 0.05]},
@@ -39,7 +40,22 @@ increment_dict = {
             'increment' : [0.01 , 0.05]},
     "H2" : {'bins' : [0.0000001 , 1.0],
             'increment' : [0.000000001 , 0.0]},
+}'''
+increment_dict = {
+    "O2" : {'bins' : [1.0],
+            'increment' : [0.01},
+    "N2" : {'bins' : [1.0],
+            'increment' : [0.0]},
+    "H2O" : {'bins' : [1.0],
+            'increment' : [0.01]},
+    "CH4" : {'bins' : [1.0],
+            'increment' : [0.01]},
+    "CO2" : {'bins' : [1.0],
+            'increment' : [0.01]},
+    "H2" : {'bins' : [1.0],
+            'increment' : [0.01]},
 }
+
 #future:
 # "O2" : {'bins' : [0.1, 0.5, 1.0],
 #        'increment' : [0.001, 0.01, 0.1]}
@@ -62,7 +78,9 @@ ATMOS_METADATA = ['atmos_start_time',
                 'previous_hash']
 
 
-MAX_JOB_RUN_TIME = 8*60*60 #in seconds
+MAX_JOB_QUEUE_TIME = 24*60*60 #in seconds
+
+EXPLORE_LIMIT = 1
 
 # GCE Info
 PROJECT_ID = 'i-agility-205814'
@@ -73,7 +91,7 @@ CLOUDSQL_SERVER_PASSWORD = 'AreWeAlone'
 CLOUDSQL_SERVER_ID = 'sql-server'
 CLOUDSQL_SERVER_IP = '35.233.245.129'
 CLOUDSQL_SERVER_REGION = "us-west1"
-CLOUDSQL_DATABASE = 'all' #'pyatmos'
+CLOUDSQL_DATABASE = 'onePerc'
 
 # Redis Server Info
 REDIS_SERVER_IP = '10.138.0.21'
@@ -82,5 +100,5 @@ REDIS_SERVER_NAME = 'pyatmos' #not an official name, just a consistent reference
 # gcloud storage bucket
 CLOUD_BUCKET_NAME = 'astrobio'
 CLOUD_STORAGE_PATH = 'gs://'+CLOUD_BUCKET_NAME  
-JOB_STORAGE_PATH = 'monday_run'
+JOB_STORAGE_PATH = 'onePerc_increment'
 

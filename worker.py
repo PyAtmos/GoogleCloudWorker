@@ -32,7 +32,7 @@ except:
 
 ####################
 ### Start PyAtmos
-atmos = pyatmos.Simulation(code_path="/code/atmos") ### CHANGE THIS ###
+atmos = pyatmos.Simulation(code_path="/code/atmos")
 atmos.start()
 ####################
 # conect to GCS storage
@@ -48,8 +48,9 @@ while not q.kill():
         # grab next set of param off queue
         packed_code = q.buy(block=True, timeout=30)
         if packed_code is not None:
-            param_code, prev_param_code = utilities.unpack_items(packed_code)
-            q.put(value=param_code, queue="run")
+            param_code, prev_param_hash, explore_count = utilities.unpack_items(packed_code)
+            #q.put(value=param_code, queue="run")
+            # ^'run' phased out...see closed issue on GitHub
 
             param_dict = utilities.param_decode(param_code)
             param_hash = utilities.param_hash(param_dict)
@@ -57,15 +58,20 @@ while not q.kill():
             for key in param_dict.keys():
                 param_dict[key] = float(param_dict[key])
 
-            # Get the previous solutions file pyatmos run! 
-            if prev_param_code == "first run":
+            if prev_param_hash == "explore only":
+                utilities.explore(
+                    param_dict=param_dict,
+                    increment_dict=increment_dict,
+                    redis_db=q,
+                    step_size=2,
+                    search_mode="sides",
+                    explore_count=explore_count)
+                continue #go back to top of loop
+            elif prev_param_hash == "first run":
                 prev_param_hash = None
                 tmp_photochem_file = None
-                tmp_clima_file = None 
-            else:
-                # previous hashes
-                prev_param_dict = utilities.param_decode(prev_param_code)
-                prev_param_hash = utilities.param_hash(prev_param_dict)
+                tmp_clima_file = None
+            else: # Get the previous solutions file pyatmos run!
                 # previous photochem 
                 tmp_photochem_file = tempfile.NamedTemporaryFile().name
                 input_photochem_blob = gcs_bucket.blob(JOB_STORAGE_PATH + '/' + prev_param_hash + '/out.dist')
@@ -96,7 +102,13 @@ while not q.kill():
                 pass
 
             ### Get Atmos Metadata
-            atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash, 'current_hash' : param_hash, 'git_revision_sha' : git_revision_sha} )
+            atmos.write_metadata(local_output_directory+'/run_metadata.json',
+                                    {
+                                    'previous_hash' : prev_param_hash,
+                                    'current_hash' : param_hash,
+                                    'git_revision_sha' : git_revision_sha
+                                    }
+                                )
             run_metadata_dict = atmos.get_metadata()
             # see config.py for list of values from run_metadata_dict that we care about
             # or go to pyatmos code -> Simulation.get_metadata()

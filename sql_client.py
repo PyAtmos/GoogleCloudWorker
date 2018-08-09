@@ -19,7 +19,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
-from sqlalchemy.sql import exists#, filter_by
+from sqlalchemy.sql import exists
 
 ####################
 ### Input arguments
@@ -28,6 +28,7 @@ parser.add_argument('-m', '--main', type=int, default=False,
                     help='if nonzero, it strictly deals with adding items from main-sql to main queue')
 parser.add_argument('-r', '--run', type=int, default=False,
                     help='if nonzero, it strictly deals with grabbing items from run queue')
+# ^'run' phased out...see closed issue on GitHub
 parser.add_argument('-c', '--complete', type=int, default=False,
                     help='if nonzero, it strictly deals with grabbing items from complete queue')
 parser.add_argument('-R', '--reset', type=int, default=False,
@@ -264,18 +265,7 @@ if (not args.run) and (not args.complete):
 else:
     pass
 
-if args.run:
-    print("Created Write SQL Client for 'Run Queue'")
-    while not q.kill():
-
-        param_code = q.get("run", block=True, timeout=30)
-        if param_code is not None:
-            msg = run_db(data=param_code, dtype="code")
-            print(msg)
-        else:
-            pass
-
-elif args.complete:
+if args.complete:
     print("Created Write SQL Client for 'Complete Queue'")
     while not q.kill():
 
@@ -309,12 +299,12 @@ elif args.main: #master True
     while not q.kill():
         #if q.size("complete")+q.size("run")+q.size("main sql")+q.size("main") == 0:
         # instead, check every .25hour
-        if time.time() >= checkpoint_time + .25*60*60:
+        if time.time() >= checkpoint_time + 1.0*60*60:
             points = session.query(ParameterSpace).filter_by(state='queue')
             for point in points:
                 timedelta = datetime.utcnow() - point.session_start_time
                 timedelta = timedelta.days * 24 * 3600 + timedelta.seconds
-                if timedelta > MAX_JOB_RUN_TIME:
+                if timedelta > MAX_JOB_QUEUE_TIME:
                     #add points back to queue
                     print("re-queueing: %s - was on for %d seconds" % (point.hash, timedelta))
                     point.state = "queue"
@@ -328,19 +318,46 @@ elif args.main: #master True
         else:
             pass
 
-        param_code = q.get("main sql", block=True, timeout=30)
-        if param_code is not None:
-            next_param_code, prev_param_code = utilities.unpack_items(param_code)
+        packed_items = q.get("main sql", block=True, timeout=30)
+        if packed_items is not None:
+            next_param_code, prev_param_hash, explore_count = utilities.unpack_items(packed_items)
             if not exists_db(next_param_code, dtype="code"): #check if item in DB already
+                explore_count = 0
+                packed_items = utilities.pack_items( [next_param_code, prev_param_hash, explore_count] )
                 msg = add_db(data=next_param_code, dtype="code")
-                q.put(param_code, "main")
+                q.put(packed_items, "main")
                 print(msg)
             else:
-                # already in the DB
-                print("repeat: %s" % utilities.param_hash(utilities.param_decode(next_param_code)))
-                pass
+                # already in the DB...check if it also completed
+                dicted = utilities.param_decode(next_param_code)
+                hashed = utilities.param_hash(dicted)
+                point = session.query(ParameterSpace).filter_by(hash=hashed).first()
+                if point.temperature is None: # didn't complete, ignore
+                    print("repeat: %s" % hashed)
+                    pass
+                elif explore_count < EXPLORE_LIMIT: #did complete, and didn't already pass limit
+                    explore_count += 1
+                    # add point to queue only so it explores
+                    packed_items = utilities.pack_items( [next_param_code, "explore only", explore_count] )
+                    q.put(packed_items, "main")
+                    print("re-explore: %s" % hashed)
+                else: #did complete, but passed limit
+                    pass
         else:
             pass
+
+''' # removed because the sql server didn't update fast enough...see issue on GitHub
+elif args.run:
+    print("Created Write SQL Client for 'Run Queue'")
+    while not q.kill():
+
+        param_code = q.get("run", block=True, timeout=30)
+        if param_code is not None:
+            msg = run_db(data=param_code, dtype="code")
+            print(msg)
+        else:
+            pass
+'''
 
 else:
     pass

@@ -85,7 +85,7 @@ def calc_filler(param_dict):
 
 ####################
 ### Explore Functions
-def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="sides"):
+def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="sides", explore_count=0):
     # let's say param_dict is not a list of values but a dictionary:
     #param_dict = {
     #            "O2" : .05,
@@ -127,7 +127,7 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
                 else:
                     # add to main queue and sql queue
                     #redis_db.put(value=neighbor, queue="main")
-                    packed_list = pack_items( [param_encode(neighbor),param_encode(param_dict)] )
+                    packed_list = pack_items( [param_encode(neighbor), param_hash(param_dict), explore_count] )
                     redis_db.put(value=packed_list, queue="main sql")
 
     elif search_mode == "diagonals":
@@ -168,7 +168,7 @@ def explore(param_dict, increment_dict, redis_db, step_size=1, search_mode="side
             else:
                 # add to main queue and sql queue
                 #redis_db.put(value=neighbor, queue="main")
-                packed_list = pack_items( [param_encode(neighbor),param_encode(param_dict)] )
+                packed_list = pack_items( [param_encode(neighbor), param_hash(param_dict), explore_count] )
                 redis_db.put(value=packed_list, queue="main sql")
     
     else:
