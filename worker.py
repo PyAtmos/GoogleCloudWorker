@@ -10,7 +10,8 @@ import sys
 import time
 from datetime import datetime
 import tempfile
-import git as gitpython 
+import git as gitpython
+import json
 
 import pyatmos 
 
