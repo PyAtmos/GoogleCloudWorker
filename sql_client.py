@@ -346,7 +346,7 @@ elif args.main: #master True
         else:
             pass
 
-''' # removed because the sql server didn't update fast enough...see issue on GitHub
+    ''' # removed because the sql server didn't update fast enough...see issue on GitHub
 elif args.run:
     print("Created Write SQL Client for 'Run Queue'")
     while not q.kill():
@@ -357,7 +357,7 @@ elif args.run:
             print(msg)
         else:
             pass
-'''
+    '''
 
 else:
     pass

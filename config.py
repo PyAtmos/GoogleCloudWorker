@@ -39,7 +39,7 @@ increment_dict = {
     "CO2" : {'bins' : [0.1 , 1.0],
             'increment' : [0.01 , 0.05]},
     "H2" : {'bins' : [0.0000001 , 1.0],
-            'increment' : [0.000000001 , 0.0]},
+            'increment' : [0.000000001 , 0.0]}
 }'''
 increment_dict = {
     "O2" : {'bins' : [1.0],
@@ -53,7 +53,7 @@ increment_dict = {
     "CO2" : {'bins' : [1.0],
             'increment' : [0.01]},
     "H2" : {'bins' : [1.0],
-            'increment' : [0.01]},
+            'increment' : [0.01]}
 }
 
 #future:
