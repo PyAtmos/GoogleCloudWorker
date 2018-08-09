@@ -96,7 +96,6 @@ while not q.kill():
                 pass
 
             ### Get Atmos Metadata
-            atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash, 'current_hash' : param_hash, 'git_revision_sha' : git_revision_sha} )
             run_metadata_dict = atmos.get_metadata()
             # see config.py for list of values from run_metadata_dict that we care about
             # or go to pyatmos code -> Simulation.get_metadata()
@@ -105,6 +104,19 @@ while not q.kill():
             run_metadata_dict['pressure'] = atmos.get_surface_pressure(local_output_directory+'/parsed_clima_final.csv')
             run_metadata_dict['temperature'] = atmos.get_surface_temperature(local_output_directory+'/parsed_clima_final.csv')
             run_metadata_dict['previous_hash'] = prev_param_hash
+
+            # add surface fluxes for gases we are interested in 
+            gases_of_interest = ['H2O', 'CO2', 'CH4', 'CO', 'N2', 'H2O', 'NH3', 'O3']
+            gas_fluxes = atmos.get_surface_fluxes(local_output_directory+'/parsed_photochem_fluxes.csv')
+            
+            # merge dictionaries 
+            run_metadata = { **run_metadata, **gas_fluxes }
+
+            # Save the metadata dictionary
+            #atmos.write_metadata(local_output_directory+'/run_metadata.json', {'previous_hash' : prev_param_hash, 'current_hash' : param_hash, 'git_revision_sha' : git_revision_sha} )
+            with open(local_output_directory+'/run_metadata.json', 'w') as fp:
+                json.dump(run_metadata, fp, sort_keys=True, indent=4)
+
 
             ### Store pyatmos results on google cloud (will grab all output files automatically) 
             file_list = os.listdir(local_output_directory)
