@@ -62,7 +62,7 @@ increment_dict = {
 
 ALTER_MOLECULES = ["O2","H2O","CH4","CO2","H2"]
 
-GASES_OF_INTEREST = ['H2O', 'CO2', 'CH4', 'CO', 'H2O', 'NH3', 'O3']
+GASES_OF_INTEREST = ['H2O', 'CO2', 'CH4', 'CO', 'NH3', 'O3']
 
 
 # 'keys' from run_metadata_dict (atmos metadata) that we want to keep and add to sql database
@@ -77,7 +77,14 @@ ATMOS_METADATA = ['atmos_start_time',
                 'temperature',
                 'pressure',
                 'run_iteration_call',
-                'previous_hash']
+                'previous_hash',
+                'flux_H2O',
+                'flux_CO2',
+                'flux_CH4',
+                'flux_CO',
+                'flux_NH3',
+                'flux_O3'
+                ]
 
 
 MAX_JOB_QUEUE_TIME = 24*60*60 #in seconds

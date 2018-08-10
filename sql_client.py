@@ -86,7 +86,6 @@ class ParameterSpace(Base):
     input_max_photochem_iterations = Column(String(256))
     temperature = Column(String(256))
     pressure = Column(String(256))
-    flux_H2O = Column(String(256))
     flux_CO2 = Column(String(256))
     flux_CH4 = Column(String(256))
     flux_CO = Column(String(256))
@@ -231,7 +230,6 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     point.input_max_photochem_iterations = metadata_dict['input_max_photochem_iterations']
     point.temperature = metadata_dict['temperature']
     point.pressure = metadata_dict['pressure']
-    flux_H2O = metadata_dict['flux_H2O']
     flux_CO2 = metadata_dict['flux_CO2']
     flux_CH4 = metadata_dict['flux_CH4']
     flux_CO = metadata_dict['flux_CO']
