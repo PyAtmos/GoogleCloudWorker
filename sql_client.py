@@ -230,12 +230,12 @@ def complete_db(data, run_status, stability, metadata_dict, dtype="dict"):
     point.input_max_photochem_iterations = metadata_dict['input_max_photochem_iterations']
     point.temperature = metadata_dict['temperature']
     point.pressure = metadata_dict['pressure']
-    flux_CO2 = metadata_dict['flux_CO2']
-    flux_CH4 = metadata_dict['flux_CH4']
-    flux_CO = metadata_dict['flux_CO']
-    flux_H2O = metadata_dict['flux_H2O']
-    flux_NH3 = metadata_dict['flux_NH3']
-    flux_O3 = metadata_dict['flux_O3']
+    point.flux_CO2 = metadata_dict['flux_CO2']
+    point.flux_CH4 = metadata_dict['flux_CH4']
+    point.flux_CO = metadata_dict['flux_CO']
+    point.flux_H2O = metadata_dict['flux_H2O']
+    point.flux_NH3 = metadata_dict['flux_NH3']
+    point.flux_O3 = metadata_dict['flux_O3']
     session.commit()
     return "completed: %s - %s" % (point.hash, run_status)
 
