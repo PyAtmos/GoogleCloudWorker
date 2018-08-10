@@ -322,7 +322,7 @@ elif args.main: #master True
                     point.state = "queue"
                     point.session_start_time = datetime.utcnow()
                     session.commit()
-                    packed_items = utilities.pack_items( [point.code, point.previous_hash] )
+                    packed_items = utilities.pack_items( [point.code, point.previous_hash, "0"] )
                     q.put(packed_items, "main")
                 else:
                     pass
