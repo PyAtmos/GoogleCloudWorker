@@ -64,7 +64,7 @@ while not q.kill():
                     param_dict=param_dict,
                     increment_dict=increment_dict,
                     redis_db=q,
-                    step_size=2,
+                    step_size=5,
                     search_mode="sides",
                     explore_count=explore_count)
                 continue #go back to top of loop
@@ -144,7 +144,7 @@ while not q.kill():
                     param_dict=param_dict,
                     increment_dict=increment_dict,
                     redis_db=q,
-                    step_size=2,
+                    step_size=5,
                     search_mode="sides")
             else:
                 pass
