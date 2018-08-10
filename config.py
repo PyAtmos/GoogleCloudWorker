@@ -89,7 +89,7 @@ ATMOS_METADATA = ['atmos_start_time',
 
 MAX_JOB_QUEUE_TIME = 24*60*60 #in seconds
 
-EXPLORE_LIMIT = 1
+EXPLORE_LIMIT = 0
 
 # GCE Info
 PROJECT_ID = 'i-agility-205814'
