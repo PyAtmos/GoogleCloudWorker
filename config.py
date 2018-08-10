@@ -87,7 +87,7 @@ ATMOS_METADATA = ['atmos_start_time',
                 ]
 
 
-MAX_JOB_QUEUE_TIME = 24*60*60 #in seconds
+MAX_JOB_QUEUE_TIME = 12*60*60 #in seconds
 
 EXPLORE_LIMIT = 0
 
