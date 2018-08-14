@@ -13,6 +13,7 @@ import rediswq
 import argparse
 
 # PACKAGES
+from copy import deepcopy
 import time
 from datetime import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
@@ -322,7 +323,10 @@ elif args.main: #master True
                     point.state = "queue"
                     point.session_start_time = datetime.utcnow()
                     session.commit()
-                    packed_items = utilities.pack_items( [point.code, point.previous_hash, "0"] )
+                    run_dict = deepcopy(start)
+                    for mol in start.keys():
+                        run_dict[mol] = point.__dict__[mol]
+                    packed_items = utilities.pack_items( [utilities.param_encode(run_dict), point.previous_hash, "0"] )
                     q.put(packed_items, "main")
                 else:
                     pass
