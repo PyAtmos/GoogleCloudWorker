@@ -86,6 +86,7 @@ ATMOS_METADATA = ['atmos_start_time',
                 'flux_O3'
                 ]
 
+RECHECK_QUEUE = 1.0 #in hours
 
 MAX_JOB_QUEUE_TIME = 12*60*60 #in seconds
 

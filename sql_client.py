@@ -15,6 +15,7 @@ import argparse
 # PACKAGES
 from copy import deepcopy
 import time
+import random
 from datetime import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -309,11 +310,11 @@ if args.complete:
 elif args.main: #master True
     print("Created Read/Write SQL Client for 'Main Queue'")
     
-    checkpoint_time = time.time()
+    checkpoint_time = time.time() + random.random()*RECHECK_QUEUE #<- add some random buffer if launching multiple sql client simultaneously
     while not q.kill():
         #if q.size("complete")+q.size("run")+q.size("main sql")+q.size("main") == 0:
         # instead, check every .25hour
-        if time.time() >= checkpoint_time + 1.0*60*60:
+        if time.time() >= checkpoint_time + RECHECK_QUEUE*60*60:
             points = session.query(ParameterSpace).filter_by(state='queue')
             for point in points:
                 timedelta = datetime.utcnow() - point.session_start_time
