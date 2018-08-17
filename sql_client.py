@@ -94,7 +94,7 @@ class ParameterSpace(Base):
     flux_NH3 = Column(String(256))
     flux_O3 = Column(String(256))
     #
-    def __init__(self, parameter_dict):
+    def __init__(self, parameter_dict, prev_hash):
         self.hash = utilities.param_hash(parameter_dict)
         self.code = utilities.param_encode(parameter_dict)
         self.O2 = parameter_dict['O2']
@@ -104,6 +104,7 @@ class ParameterSpace(Base):
         self.CO2 = parameter_dict['CO2']
         self.H2 = parameter_dict['H2']
         self.state = "queue"
+        self.previous_hash = prev_hash
         self.session_start_time = datetime.utcnow()
 
 if args.reset:
@@ -125,7 +126,7 @@ else:
 ####################
 ### SQL Read + Write Functions
 
-def add_db(data, dtype="dict"):
+def add_db(data, dtype="dict", prev_hash=None):
     # Insert a Person in the person table
     if dtype == "dict":
         dicted = data
@@ -133,7 +134,7 @@ def add_db(data, dtype="dict"):
         dicted = utilities.param_decode(data)
     else:
         return "didn't recognize 'dtype'"
-    point = ParameterSpace(dicted)
+    point = ParameterSpace(dicted, prev_hash)
     hashed = point.hash
     session.add(point)
     session.commit()
@@ -322,11 +323,11 @@ elif args.main: #master True
                     print("re-queueing: %s - was on for %d seconds" % (point.hash, timedelta))
                     point.state = "queue"
                     point.session_start_time = datetime.utcnow()
-                    session.commit()
                     run_dict = deepcopy(start)
                     for mol in start.keys():
                         run_dict[mol] = point.__dict__[mol]
                     packed_items = utilities.pack_items( [utilities.param_encode(run_dict), point.previous_hash, "0"] )
+                    session.commit()
                     q.put(packed_items, "main")
                 else:
                     pass
@@ -340,7 +341,7 @@ elif args.main: #master True
             if not exists_db(next_param_code, dtype="code"): #check if item in DB already
                 explore_count = 0
                 packed_items = utilities.pack_items( [next_param_code, prev_param_hash, str(explore_count)] )
-                msg = add_db(data=next_param_code, dtype="code")
+                msg = add_db(data=next_param_code, dtype="code", prev_hash=prev_param_hash)
                 q.put(packed_items, "main")
                 print(msg)
             else:
