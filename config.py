@@ -49,11 +49,11 @@ increment_dict = {
     "H2O" : {'bins' : [1.0],
             'increment' : [0.01]},
     "CH4" : {'bins' : [1.0],
-            'increment' : [0.01]},
+            'increment' : [0.005]},
     "CO2" : {'bins' : [1.0],
             'increment' : [0.01]},
     "H2" : {'bins' : [1.0],
-            'increment' : [0.01]}
+            'increment' : [0.005]}
 }
 
 #future:
@@ -110,5 +110,5 @@ REDIS_SERVER_NAME = 'pyatmos' #not an official name, just a consistent reference
 # gcloud storage bucket
 CLOUD_BUCKET_NAME = 'astrobio'
 CLOUD_STORAGE_PATH = 'gs://'+CLOUD_BUCKET_NAME  
-JOB_STORAGE_PATH = 'monday_run'
+JOB_STORAGE_PATH = 'final_day'
 
