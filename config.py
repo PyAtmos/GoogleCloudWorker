@@ -101,7 +101,7 @@ CLOUDSQL_SERVER_PASSWORD = 'AreWeAlone'
 CLOUDSQL_SERVER_ID = 'sql-server'
 CLOUDSQL_SERVER_IP = '35.233.245.129'
 CLOUDSQL_SERVER_REGION = "us-west1"
-CLOUDSQL_DATABASE = 'onePerc'
+CLOUDSQL_DATABASE = 'finalDay'
 
 # Redis Server Info
 REDIS_SERVER_IP = '10.138.0.21'
@@ -110,5 +110,5 @@ REDIS_SERVER_NAME = 'pyatmos' #not an official name, just a consistent reference
 # gcloud storage bucket
 CLOUD_BUCKET_NAME = 'astrobio'
 CLOUD_STORAGE_PATH = 'gs://'+CLOUD_BUCKET_NAME  
-JOB_STORAGE_PATH = 'final_day'
+JOB_STORAGE_PATH = 'finalDay'
 
